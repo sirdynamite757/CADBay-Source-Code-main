@@ -10,8 +10,8 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <ifaddrs.h>
-
-#define PORT 3000
+#include <errno.h>
+#define PORT 3000            /* default; can be overridden by PORT env var */
 #define BACKLOG 5
 #define BUFFER_SIZE 4096
 #define MAX_FILENAME 256
@@ -192,14 +192,27 @@ int main() {
         exit(EXIT_FAILURE);
     }
     
+    /* determine port number, allowing an environment override */
+    int port = PORT;
+    char *env_port = getenv("PORT");
+    if (env_port) {
+        int tmp = atoi(env_port);
+        if (tmp > 0 && tmp < 65536) {
+            port = tmp;
+        }
+    }
+
     // Bind socket
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    server_addr.sin_port = htons(PORT);
+    server_addr.sin_port = htons(port);
     
     if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
         perror("bind");
+        if (errno == EADDRINUSE) {
+            fprintf(stderr, "(port %d already in use)\n", port);
+        }
         close(server_socket);
         exit(EXIT_FAILURE);
     }
