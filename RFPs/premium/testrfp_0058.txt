@@ -1,0 +1,9 @@
+RFP ID: testrfp_0058
+Owner: forge_and_line
+Title: Hydraulic Manifold #603
+Short Description: Creo Hydraulic Manifold for a studio.
+Long Description: Deliver a fully constrained parametric model with a manufacturing drawing set. Estimated effort: 156 hours.
+Budget: 2500.00
+Tier: premium
+Project Type: engineering
+Program: Creo

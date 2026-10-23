@@ -1,0 +1,9 @@
+RFP ID: testrfp_0031
+Owner: hexbolt
+Title: Loft Conversion #773
+Short Description: Chief Architect Loft Conversion for a studio.
+Long Description: Model the existing structure and show the proposed extension in two options. Estimated effort: 26 hours.
+Budget: 4800.00
+Tier: free
+Project Type: architectural
+Program: Chief Architect

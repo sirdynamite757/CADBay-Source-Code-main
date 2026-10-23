@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My RFPs - CADBay</title>
+    <meta name="application-name" content="CADBay - my-rfps">
+    <link rel="stylesheet" href="colorDefault.css">
+    <script src="api-config.js"></script>
+    <script src="dynamics.js"></script>
+</head>
+<body id="cadbay-my-rfps" data-app="cadbay">
+    <div id="header"></div>
+
+        <main class="account-page">
+        <h1>My RFPs</h1>
+                <p>Requests for proposal created by your account.</p>
+                <div id="rfp-list" class="account-list">Loading RFPs...</div>
+    </main>
+
+
+    <script>
+        fetch(cadbayApiUrl('/my-rfps'), { credentials: 'include' }).then(response => {
+            if (!response.ok) throw new Error('Please sign in to view your RFPs.');
+            return response.json();
+        }).then(rfps => {
+            const list = document.getElementById('rfp-list');
+            if (!rfps.length) {
+                list.textContent = 'No RFPs have been created yet.';
+                return;
+            }
+            list.innerHTML = rfps.map(rfp => `<article class="account-list-item"><h2>${escapeHtml(rfp.project_name || rfp.id)}</h2><p>${escapeHtml(rfp.short_description || '')}</p><a href="/rfp-template?id=${encodeURIComponent(rfp.id)}">View RFP</a></article>`).join('');
+        }).catch(error => {
+            document.getElementById('rfp-list').textContent = error.message;
+        });
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>'"]/g, character => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[character]));
+        }
+        function openRFPForm() {
+            window.location.href = './create-rfp.html';
+        }
+        
+    </script> <!-- same style and color as login button, centered, 50x100px-->
+    <div style="text-align: center; margin-top: 20px; margin-bottom: 20px;">
+    <button onclick="openRFPForm()" style="width: 200px; height: 40px; font-size: 18px;">Create an RFP</button>
+</div>
+
+
+    <div id="footer"></div>
+</body>
+</html>

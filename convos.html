@@ -1,0 +1,72 @@
+<!-- the chats for in depth designing   -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CADBay - Convos</title>
+    <link rel="stylesheet" href="colorDefault.css">
+    <link rel="icon" type="image/png" href="/assets/CADBayIcon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="application-name" content="CADBay Convos">
+    <script src="dynamics.js"></script> <!-- load the dynamics.js file to handle the header, footer, and token processing -->
+</head>
+<body>
+    <div id="header">  <!-- dynamic header and footer-->
+
+    </div>
+
+    <div id="convos-container" class="convos-container">
+        <aside class="convo-list" aria-label="Conversations sidebar">
+            <div class="convo-list-header">
+                <div>
+                    <p class="eyebrow">Workspace</p>
+                    <h1>Conversations</h1>
+                </div>
+                <button id="navToggle" class="sidebar-toggle" type="button" aria-label="Collapse conversations sidebar" aria-expanded="true">
+                    <span aria-hidden="true">&#8249;</span>
+                </button>
+            </div>
+            <label class="convo-search">
+                <span aria-hidden="true">&#8981;</span>
+                <input id="convoSearch" type="search" placeholder="Search conversations" autocomplete="off">
+            </label>
+            <ul id="convoList">
+                <li class="convo-empty" id="convoEmpty">
+                    <span class="empty-icon" aria-hidden="true">&#9993;</span>
+                    <strong>No conversations yet</strong>
+                    <span>Messages with project partners will appear here.</span>
+                </li>
+            </ul>
+        </aside>
+        <main class="convo-window">
+            <button id="mobileNavToggle" class="mobile-nav-toggle" type="button" aria-label="Open conversations sidebar">
+                <span aria-hidden="true">&#9776;</span>
+            </button>
+            <div class="convo-window-header">
+                <div>
+                    <p class="eyebrow">Direct messages</p>
+                    <h2 id="convoTitle">Select a conversation</h2>
+                </div>
+                <span class="conversation-status">Ready when you are</span>
+            </div>
+            <div id="convoMessages" class="convo-messages">
+                <div class="conversation-placeholder">
+                    <span class="placeholder-icon" aria-hidden="true">&#9993;</span>
+                    <h3>Choose a conversation</h3>
+                    <p>Pick a thread from the sidebar to view messages and reply.</p>
+                </div>
+            </div>
+            <div class="convo-input">
+                <input type="text" id="messageInput" placeholder="Select a conversation to reply" disabled>
+                <button id="sendMessageBtn" type="button" disabled>Send</button>
+            </div>
+        </main>
+    </div>
+    <script src="convos.js"></script>
+
+
+    <div id="footer"> </div>
+
+
+</html>

@@ -1,0 +1,9 @@
+RFP ID: testrfp_0049
+Owner: hexbolt
+Title: Cabin Concept #793
+Short Description: Revit Cabin Concept for a indie team.
+Long Description: Produce a 3D model plus plan and elevation sheets suitable for a planning submission. Estimated effort: 100 hours.
+Budget: 12000.00
+Tier: premium
+Project Type: architectural
+Program: Revit

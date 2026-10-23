@@ -4,7 +4,7 @@
 
 LISTEN_PORT=${1:-443}
 BACKEND_HOST=${2:-127.0.0.1}
-BACKEND_PORT=${3:-3000}
+BACKEND_PORT=${3:-4000}
 CERT_DIR=${4:-certs}
 CERT_FILE="$CERT_DIR/server.cert.pem"
 KEY_FILE="$CERT_DIR/server.key.pem"

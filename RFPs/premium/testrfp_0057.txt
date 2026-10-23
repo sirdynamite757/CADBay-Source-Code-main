@@ -1,0 +1,9 @@
+RFP ID: testrfp_0057
+Owner: nova_design
+Title: Asset Validator #186
+Short Description: Custom Game Engines Asset Validator for a startup.
+Long Description: Editor extension that validates naming conventions across the asset database. Estimated effort: 27 hours.
+Budget: 1200.00
+Tier: premium
+Project Type: tool-programming
+Program: Custom Game Engines

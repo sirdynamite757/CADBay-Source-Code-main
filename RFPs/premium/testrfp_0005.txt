@@ -1,0 +1,9 @@
+RFP ID: testrfp_0005
+Owner: meridian3d
+Title: Weapon Set #651
+Short Description: 3ds Max Weapon Set for a studio.
+Long Description: Three material variants of a weapon skin using the provided UV layout. Estimated effort: 214 hours.
+Budget: 2500.00
+Tier: premium
+Project Type: game-texturing
+Program: 3ds Max

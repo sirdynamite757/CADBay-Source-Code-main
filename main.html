@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ensure relative paths work in both live preview and production -->
+    <base href="./">
+    <!-- CSS now referenced relative; server will prepends Body/ when necessary -->
+    <link rel="stylesheet" href="colorDefault.css">
+    <meta name="application-name" content="CADBay Homepage">
+    <title>CADBay - Homepage</title>
+    <script src="./api-config.js"></script>
+    <script src="./dynamics.js"></script>
+</head>
+<body id="cadbay-homepage" data-app="cadbay">
+    <div id="header"></div>
+    
+    
+    <div id="cadbay-app-wrapper" style="display: flex; align-items: flex-start; gap: 20px;">
+        <main id="cadbay-main-content" class="page-shell">
+            <section class="hero-panel">
+                <div>
+                    <h1>Find the CAD talent your project needs.</h1>
+                    <p>CADBay brings together designers, engineers, modelers, and developers to create faster, sharper, and more collaborative project workflows.</p>
+                    <div class="hero-actions"><!-- why are these buttons not working? -->
+                        <a href="/browseRFPs"><button class="link" href="/browseRFPs">Browse RFPs</button></a><!-- links to browse RFPs -->
+                        <a href="/create-rfp.html"><button href="/create-rfp.html" class="link" >Create a project</button></a> <!-- links to create a project -->
+                    </div>
+                </div>
+                <div class="policy-card">
+                    <h3>Why CADBay</h3>
+                    <p>Secure project matching, clearer scope planning, and premium access for advanced users who need faster turnaround and stronger collaboration.</p>
+                </div>
+            </section>
+
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <strong>3</strong>
+                    <span>Design briefs published</span>
+                </div>
+                <div class="metric-card">
+                    <strong>98%</strong>
+                    <span>Project communication satisfaction</span>
+                </div>
+                <div class="metric-card">
+                    <strong>24/7</strong>
+                    <span>Access for active members</span>
+                </div>
+            </div>
+
+            <h2 class="section-title">Built for modern CAD work</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Project discovery</h3>
+                    <p>Search curated RFPs by discipline, software stack, and deliverable type.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Premium workflows</h3>
+                    <p>Unlock richer project visibility and faster access for premium and enterprise accounts.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Community trust</h3>
+                    <p>Keep communication organized while protecting buyer and creator expectations.</p>
+                </div>
+            </div>
+
+            <div class="policy-card">
+                <h3>Project status</h3>
+                <p><gr>Registration</gr> · <gr>Login / Logout</gr> · <yl>RFP and proposal system</yl> · <yl>Dashboard</yl> · <yl>Premium access</yl> · <yl>Ad system</yl></p>
+            </div>
+        </main>
+        <aside id="ad-panel" style="width: 320px; padding: 6px; border-left: 1px solid transparent; background: transparent; min-height: 240px;">
+            <div id="ad-block" style="padding: 4px 20px;"></div>
+        </aside>
+    </div>
+    
+    <div id="footer"></div>
+    <div id="auth-container"></div>
+</body>
+</html> 

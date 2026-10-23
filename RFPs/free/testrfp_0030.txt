@@ -1,0 +1,9 @@
+RFP ID: testrfp_0030
+Owner: blueorbit
+Title: Conveyor Run #190
+Short Description: Solidworks Conveyor Run for a OEM.
+Long Description: Lay out the full line with clearance envelopes and an interference check report. Estimated effort: 117 hours.
+Budget: 7500.00
+Tier: free
+Project Type: industrial
+Program: Solidworks

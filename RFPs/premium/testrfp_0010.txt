@@ -1,0 +1,9 @@
+RFP ID: testrfp_0010
+Owner: nova_design
+Title: Frame Weldment #863
+Short Description: CATIA Frame Weldment for a startup.
+Long Description: Reverse engineer an existing part and produce a watertight STEP exchange model. Estimated effort: 64 hours.
+Budget: 7500.00
+Tier: premium
+Project Type: engineering
+Program: CATIA

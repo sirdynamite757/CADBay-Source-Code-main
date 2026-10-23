@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CADBay — Code Submission Viewer</title>
+<style>
+  :root { --bg:#101010; --panel:#181818; --accent:#dd0000; --fg:#eaeaea; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg);
+         font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+         user-select:none; -webkit-user-select:none; }
+  header { display:flex; align-items:center; gap:12px; padding:10px 16px;
+           background:var(--panel); border-bottom:1px solid #2a2a2a; }
+  header h1 { font-size:15px; margin:0; font-weight:600; }
+  header .tag { font-size:11px; color:#999; }
+  .wrap { display:flex; height:calc(100vh - 49px); }
+  #stage { flex:1; position:relative; overflow:auto; background:#0d0d0d; }
+  aside { width:300px; background:var(--panel); border-left:1px solid #2a2a2a;
+          padding:14px; overflow:auto; }
+  aside h2 { font-size:12px; text-transform:uppercase; letter-spacing:.08em;
+             color:#8a8a8a; margin:0 0 8px; }
+  .row { margin-bottom:12px; }
+  button { background:#222; color:var(--fg); border:1px solid #333;
+           border-radius:6px; padding:7px 10px; font:inherit; cursor:pointer; }
+  button:hover { border-color:var(--accent); }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  input[type=file] { display:none; }
+  #meta { font:12px/1.6 ui-monospace,Menlo,Consolas,monospace; color:#bbb;
+          white-space:pre-wrap; word-break:break-word; }
+  .note { font-size:11px; color:#777; border-top:1px solid #2a2a2a; padding-top:10px; }
+  .badge { display:inline-block; font-size:10px; padding:2px 6px; border-radius:4px;
+           background:#2a1010; color:#ff8080; border:1px solid #5a2020; }
+  #empty { color:#666; font-size:13px; text-align:center; padding:40px; }
+  #out { margin:0; padding:16px; font:12.5px/1.55 ui-monospace,Menlo,Consolas,monospace;
+         white-space:pre; tab-size:4; color:#ddd; }
+  #out .ln { color:#555; user-select:none; display:inline-block; width:3.2em;
+             text-align:right; margin-right:1em; }
+  .kw { color:#ff7b72; } .str { color:#a5d6ff; } .num { color:#79c0ff; }
+  .com { color:#8b949e; font-style:italic; } .pre { color:#d2a8ff; }
+</style>
+</head>
+<body>
+<header>
+  <h1>CADBay Code Submission Viewer</h1>
+  <span class="tag" id="subtag">no submission loaded</span>
+  <span class="badge">view-only</span>
+</header>
+
+<div class="wrap">
+  <div id="stage">
+    <div id="empty">Load a source file to review it.<br>
+      Code is shown read-only, watermarked, and rendered to PDF server-side on submission.</div>
+    <pre id="out" style="display:none"></pre>
+  </div>
+
+  <aside>
+    <h2>Submission</h2>
+    <div class="row"><input type="file" id="file"
+        accept=".c,.h,.cpp,.hpp,.cc,.js,.ts,.py,.java,.cs,.go,.rs,.rb,.php,.sh,.sql,.txt">
+      <button class="primary" id="pick">Choose file…</button></div>
+
+    <h2>View</h2>
+    <div class="row"><button id="wrap">Toggle line wrap</button></div>
+    <div class="row"><button id="print">Open PDF build</button></div>
+
+    <h2>Details</h2>
+    <div id="meta">—</div>
+
+    <div class="note">
+      Read-only review. Downloading, copying, screenshotting and scraping are
+      prohibited. This view is watermarked and traceable to the viewer and time
+      it was opened.
+    </div>
+  </aside>
+</div>
+
+<script src="deter.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var out = document.getElementById('out');
+    var metaEl = document.getElementById('meta');
+    var subTag = document.getElementById('subtag');
+    var emptyEl = document.getElementById('empty');
+    var fileInput = document.getElementById('file');
+    var wrapped = false;
+
+    function basename(p) { return (p || '').split(/[\\/]/).pop(); }
+    function ext(p) { var m = /\.([a-z0-9]+)$/i.exec(p || ''); return m ? m[1].toLowerCase() : ''; }
+    function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+    function escapeHTML(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    /* Lightweight, language-agnostic highlighter. Good enough to read code
+     * without pulling in a syntax-highlighting dependency. */
+    function highlight(text) {
+        var esc = escapeHTML(text);
+        // Comments first so their content is not further tokenised.
+        esc = esc.replace(/(\/\/[^\n]*|#[^\n]*|\/\*[\s\S]*?\*\/)/g, '§C$1§c');
+        esc = esc.replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g, '§S$1§s');
+        esc = esc.replace(/\b(\d+(?:\.\d+)?)\b/g, '§N$1§n');
+        var kws = ['if','else','for','while','return','int','char','void','float','double',
+                   'struct','typedef','const','static','unsigned','signed','long','short',
+                   'sizeof','switch','case','break','continue','default','class','public',
+                   'private','protected','new','delete','function','var','let','const',
+                   'import','from','export','def','elif','try','catch','finally','throw',
+                   'include','define','null','true','false','None','True','False'];
+        var kwRe = new RegExp('\\b(' + kws.join('|') + ')\\b', 'g');
+        // Protect our delimiters from the keyword pass by only replacing outside them.
+        esc = esc.replace(kwRe, '§K$1§k');
+        esc = esc.replace(/#(include|define)\b/g, '§P$1§p');
+        esc = esc.replace(/§([CSNKP])([\s\S]*?)§([csnkp])/g, function (_, t, body) {
+            var cls = { C:'com', S:'str', N:'num', K:'kw', P:'pre' }[t];
+            return '<span class="' + cls + '">' + body + '</span>';
+        });
+        return esc;
+    }
+
+    function render(text, name, e) {
+        var lines = text.split(/\r?\n/);
+        var html = [];
+        for (var i = 0; i < lines.length; i++) {
+            html.push('<span class="ln">' + (i + 1) + '</span>' + highlight(lines[i]));
+        }
+        out.innerHTML = html.join('\n');
+        out.style.display = 'block';
+        emptyEl.style.display = 'none';
+        subTag.textContent = name;
+        CADBayDeter.setWatermark(CADBayDeter.makeMark(name));
+        metaEl.textContent = [
+            'file    : ' + name,
+            'language: ' + e.toUpperCase(),
+            'lines   : ' + fmt(lines.length),
+            'chars   : ' + fmt(text.length),
+            'mode    : read-only'
+        ].join('\n');
+    }
+
+    function loadBuffer(name, buffer) {
+        var text = new TextDecoder('utf-8').decode(buffer);
+        render(text, basename(name), ext(name));
+    }
+
+    function loadFile(file) {
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () { loadBuffer(file.name, reader.result); };
+        reader.onerror = function () { metaEl.textContent = 'Could not read file.'; };
+        reader.readAsArrayBuffer(file);
+    }
+
+    document.getElementById('pick').addEventListener('click', function () { fileInput.click(); });
+    fileInput.addEventListener('change', function () {
+        loadFile(fileInput.files && fileInput.files[0]);
+    });
+    document.getElementById('wrap').addEventListener('click', function () {
+        wrapped = !wrapped;
+        out.style.whiteSpace = wrapped ? 'pre-wrap' : 'pre';
+    });
+    document.getElementById('print').addEventListener('click', function () {
+        /* The PDF is produced server-side at submission time; this just opens it. */
+        var params = new URLSearchParams(location.search);
+        var pdf = params.get('pdf');
+        if (pdf) window.open(pdf, '_blank', 'noopener');
+        else metaEl.textContent = metaEl.textContent.split('\n')[0] +
+            '\n(no PDF build available for this submission yet)';
+    });
+
+    var src = new URLSearchParams(location.search).get('src');
+    if (src) {
+        fetch(src, { credentials: 'same-origin' })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); })
+            .then(function (buf) { loadBuffer(src, buf); })
+            .catch(function (err) { metaEl.textContent = 'Failed to load ' + src + ': ' + err.message; });
+    }
+})();
+</script>
+</body>
+</html>

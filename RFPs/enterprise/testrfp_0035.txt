@@ -1,0 +1,9 @@
+RFP ID: testrfp_0035
+Owner: apex_cad
+Title: Blueprint Textures #416
+Short Description: svg Blueprint Textures for a indie team.
+Long Description: 50 royalty-free blueprint-style backgrounds at 4K, sRGB, JPEG. Estimated effort: 60 hours.
+Budget: 4800.00
+Tier: enterprise
+Project Type: stock-images
+Program: svg

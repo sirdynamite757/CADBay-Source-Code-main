@@ -1,0 +1,9 @@
+RFP ID: testrfp_0034
+Owner: blueorbit
+Title: Combat Prototype #322
+Short Description: GameMaker Studio Combat Prototype for a supplier.
+Long Description: Write a deterministic procedural generator for cave layouts with seeded runs. Estimated effort: 113 hours.
+Budget: 2500.00
+Tier: enterprise
+Project Type: game-programming
+Program: GameMaker Studio

@@ -1,0 +1,9 @@
+RFP ID: testrfp_0055
+Owner: hexbolt
+Title: Robot Workcell #523
+Short Description: AutoCAD Robot Workcell for a indie team.
+Long Description: Design a jig that holds the part within 0.2mm through the weld cycle. Estimated effort: 24 hours.
+Budget: 2500.00
+Tier: enterprise
+Project Type: industrial
+Program: AutoCAD

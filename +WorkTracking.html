@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="application-name" content="CADBay - Moderation">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Work tracking - CADBay Moderation</title>
+    <link rel="stylesheet" href="colorDefault.css">
+    <link rel="stylesheet" href="mod-tools.css">
+    <script src="api-config.js"></script>
+    <script src="dynamics.js"></script>
+    <script src="mod-tools.js" defer></script>
+</head>
+
+<body id="cadbay-mod-work-tracking" data-app="cadbay">
+    <div id="header"></div>
+
+    <div id="mod-access-denied" class="mod-access-denied" hidden>
+        <h1>Access denied</h1>
+        <p data-denied-reason>You need a moderator or developer account to view this page.</p>
+        <p><a href="/">Return to CADBay</a></p>
+    </div>
+
+    <main id="mod-shell" class="mod-shell">
+        <div class="mod-header">
+            <div>
+                <h1>Work tracking</h1>
+                <p class="mod-subtitle">Moderation tasks and who is working on what.</p>
+            </div>
+        </div>
+
+        <nav class="mod-nav">
+            <a href="/+Approvals.html">Approvals</a>
+            <a href="/+Reports.html">Reports</a>
+            <a href="/+WorkTracking.html">Work tracking</a>
+        </nav>
+
+        <div id="mod-message" class="mod-message"></div>
+
+        <div class="mod-toolbar">
+            <label for="mod-filter">Status</label>
+            <select id="mod-filter">
+                <option value="">All</option>
+                <option value="open">Open</option>
+                <option value="in-progress">In progress</option>
+                <option value="complete">Complete</option>
+            </select>
+            <input id="mod-search" type="search" placeholder="Search tasks" aria-label="Search tasks">
+            <button id="mod-refresh" class="mod-refresh" type="button">Refresh</button>
+        </div>
+
+        <div id="mod-summary" class="mod-summary"></div>
+
+        <div class="mod-table-wrap">
+            <table class="mod-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Task</th>
+                        <th scope="col">Assigned to</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Updated</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="mod-rows">
+                    <tr>
+                        <td colspan="5" class="mod-empty">Loading tasks…</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.modTools) window.modTools.initPage({ store: 'tasks' });
+        });
+    </script>
+</body>
+
+</html>

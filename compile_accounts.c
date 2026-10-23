@@ -12,7 +12,7 @@
 #define BUFFER_SIZE 4096
 
 /**
- * Encrypt a single account JSON file using AES-256-CBC
+ * Encrypt a single account text file using AES-256-CBC
  * Returns 1 on success, 0 on failure
  */
 int encrypt_file(const char *input_path, const char *output_path) {
@@ -120,7 +120,7 @@ int main() {
 
     while ((entry = readdir(dir)) != NULL) {
         if (entry->d_type != DT_REG) continue;
-        if (!strstr(entry->d_name, ".json")) continue;
+        if (!strstr(entry->d_name, ".txt")) continue;
 
         char input_path[512], output_path[512];
         snprintf(input_path, sizeof(input_path), "%s/%s", ACCOUNTS_DIR, entry->d_name);

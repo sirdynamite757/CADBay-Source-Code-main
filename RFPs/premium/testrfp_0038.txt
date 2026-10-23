@@ -1,0 +1,9 @@
+RFP ID: testrfp_0038
+Owner: cinder_studio
+Title: Parts Catalog #652
+Short Description: html Parts Catalog for a indie team.
+Long Description: Build an embeddable widget that loads a glTF model and exposes orbit controls. Estimated effort: 57 hours.
+Budget: 500.00
+Tier: premium
+Project Type: webpage-development
+Program: html

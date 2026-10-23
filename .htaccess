@@ -1,0 +1,60 @@
+# Enable mod_rewrite
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Don't rewrite if it's a real file
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  # Don't rewrite if it's a real directory
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Hide .html extension - serve HTML files without .html
+  RewriteCond %{REQUEST_FILENAME}\.html -f
+  RewriteRule ^(.*)$ $1.html [NC,L] 
+# why did this cause a download: The server is not configured to handle .html files properly.
+# how do i fix this: Ensure that the server is configured to serve .html files with the correct MIME type (text/html). This can be done by checking the server configuration or .htaccess file for proper handling of .html files.
+#can you fix it: Yes, you can fix it by adding the following line to your .htaccess file to ensure that .html files are served with the correct MIME type:
+
+  AddType text/html .html
+  # Hide .php extension (if using PHP)
+  RewriteCond %{REQUEST_FILENAME}\.php -f
+  RewriteRule ^(.*)$ $1.php [NC,L]
+
+  # Redirect URLs with extensions to extensionless versions
+  RewriteRule ^(.+)\.html$ /$1 [R=301,L]
+  RewriteRule ^(.+)\.php$ /$1 [R=301,L]
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# Enable GZIP compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript
+</IfModule> 
+
+#block acsess to unauthorized files
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|inc)$">
+  Order Allow,Deny
+  Deny from all
+</FilesMatch>
+
+# only show users their own files or authorzed files
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_URI} !^/user-dashboard$
+  RewriteCond %{REQUEST_URI} !^/user-dashboard/.*$
+  RewriteCond %{REQUEST_URI} !^/user-dashboard/.*\.html$
+  RewriteRule ^user-dashboard/.*$ - [F,L]
+</IfModule>
+
+# account and user dashboard access control, always use the same url just show the user only their info, the user's id is stored in the cookies folder under the name cadbay_token
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP_COOKIE} cadbay_token=([^;]+) [NC]
+  RewriteRule ^account$ /account/dashboard [R=302,L]
+</IfModule>

@@ -1,0 +1,9 @@
+RFP ID: testrfp_0015
+Owner: apex_cad
+Title: Weapon Set #366
+Short Description: 3ds Max Weapon Set for a studio.
+Long Description: PBR textures at 2K for a six-piece environment kit, tileable and optimised. Estimated effort: 101 hours.
+Budget: 24000.00
+Tier: free
+Project Type: game-texturing
+Program: 3ds Max

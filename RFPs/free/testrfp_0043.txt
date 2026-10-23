@@ -1,0 +1,9 @@
+RFP ID: testrfp_0043
+Owner: blueorbit
+Title: Grid Backgrounds #336
+Short Description: jpg Grid Backgrounds for a studio.
+Long Description: 50 royalty-free blueprint-style backgrounds at 4K, sRGB, JPEG. Estimated effort: 174 hours.
+Budget: 7500.00
+Tier: free
+Project Type: stock-images
+Program: jpg

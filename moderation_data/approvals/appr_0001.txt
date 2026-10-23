@@ -1,0 +1,8 @@
+title: Gearbox Housing upload
+owner: atlas_works
+kind: model
+status: pending
+detail: STEP file submitted for public listing.
+updated: 2026-10-20 14:12
+status: approved
+updated: 1792604337

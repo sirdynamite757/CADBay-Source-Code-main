@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CADBay — 3D Submission Viewer</title>
+<style>
+  :root { --bg:#101010; --panel:#181818; --accent:#dd0000; --fg:#eaeaea; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg);
+         font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+         user-select:none; -webkit-user-select:none; }
+  header { display:flex; align-items:center; gap:12px; padding:10px 16px;
+           background:var(--panel); border-bottom:1px solid #2a2a2a; }
+  header h1 { font-size:15px; margin:0; font-weight:600; }
+  header .tag { font-size:11px; color:#999; }
+  .wrap { display:flex; height:calc(100vh - 49px); }
+  #stage { flex:1; position:relative; }
+  #gl { width:100%; height:100%; display:block; }
+  aside { width:300px; background:var(--panel); border-left:1px solid #2a2a2a;
+          padding:14px; overflow:auto; }
+  aside h2 { font-size:12px; text-transform:uppercase; letter-spacing:.08em;
+             color:#8a8a8a; margin:0 0 8px; }
+  .row { margin-bottom:12px; }
+  button { background:#222; color:var(--fg); border:1px solid #333;
+           border-radius:6px; padding:7px 10px; font:inherit; cursor:pointer; }
+  button:hover { border-color:var(--accent); }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  input[type=file] { display:none; }
+  #meta { font:12px/1.6 ui-monospace,Menlo,Consolas,monospace; color:#bbb;
+          white-space:pre-wrap; word-break:break-word; }
+  .note { font-size:11px; color:#777; border-top:1px solid #2a2a2a; padding-top:10px; }
+  .badge { display:inline-block; font-size:10px; padding:2px 6px; border-radius:4px;
+           background:#2a1010; color:#ff8080; border:1px solid #5a2020; }
+  #empty { position:absolute; inset:0; display:flex; align-items:center;
+           justify-content:center; color:#666; font-size:13px; text-align:center;
+           padding:20px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>CADBay 3D Submission Viewer</h1>
+  <span class="tag" id="subtag">no submission loaded</span>
+  <span class="badge">view-only</span>
+</header>
+
+<div class="wrap">
+  <div id="stage">
+    <canvas id="gl"></canvas>
+    <div id="empty">Load a submission to preview it.<br>
+      Supports STL, OBJ and STEP.</div>
+  </div>
+
+  <aside>
+    <h2>Submission</h2>
+    <div class="row"><input type="file" id="file" accept=".stl,.obj,.step,.stp">
+      <button class="primary" id="pick">Choose file…</button></div>
+
+    <h2>View</h2>
+    <div class="row"><button id="reset">Reset view</button></div>
+
+    <h2>Details</h2>
+    <div id="meta">—</div>
+
+    <div class="note">
+      Viewing and inspection only. Downloading, copying, screenshotting and
+      scraping are prohibited. This preview is watermarked and traceable to the
+      viewer and time it was opened.
+    </div>
+  </aside>
+</div>
+
+<script src="deter.js"></script>
+<script src="viewer3d.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var canvas = document.getElementById('gl');
+    var metaEl = document.getElementById('meta');
+    var subTag = document.getElementById('subtag');
+    var emptyEl = document.getElementById('empty');
+    var fileInput = document.getElementById('file');
+
+    var viewer;
+    try {
+        viewer = CADBay3D.createViewer(canvas);
+        viewer.start();
+    } catch (err) {
+        metaEl.textContent = 'WebGL unavailable: ' + err.message;
+    }
+
+    function basename(p) { return (p || '').split(/[\\/]/).pop(); }
+    function ext(p) { var m = /\.([a-z0-9]+)$/i.exec(p || ''); return m ? m[1].toLowerCase() : ''; }
+    function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+    function showMeta(lines) { metaEl.textContent = lines.join('\n'); }
+
+    function loadBuffer(name, buffer) {
+        var e = ext(name);
+        var id = basename(name);
+        subTag.textContent = id;
+        CADBayDeter.setWatermark(CADBayDeter.makeMark(id));
+
+        if (e === 'stl') {
+            var mesh = CADBay3D.parseSTL(buffer);
+            if (!mesh.count) { metaEl.textContent = 'No triangles found in STL.'; return; }
+            viewer.setMesh(mesh);
+            emptyEl.style.display = 'none';
+            showMeta(['file    : ' + id, 'format  : STL',
+                      'tris    : ' + fmt(mesh.count / 3),
+                      'vertices: ' + fmt(mesh.count)]);
+            return;
+        }
+
+        if (e === 'obj') {
+            var obj = CADBay3D.parseOBJ(new TextDecoder('utf-8').decode(buffer));
+            if (!obj.count) { metaEl.textContent = 'No faces found in OBJ.'; return; }
+            viewer.setMesh(obj);
+            emptyEl.style.display = 'none';
+            showMeta(['file    : ' + id, 'format  : OBJ',
+                      'tris    : ' + fmt(obj.count / 3),
+                      'vertices: ' + fmt(obj.count)]);
+            return;
+        }
+
+        if (e === 'step' || e === 'stp') {
+            var step = CADBay3D.parseSTEP(new TextDecoder('utf-8').decode(buffer));
+            emptyEl.style.display = 'flex';
+            emptyEl.textContent = 'STEP geometry preview requires the server-side converter. Metadata below.';
+            var lines = ['file    : ' + id, 'format  : STEP', 'entities: ' + fmt(step.entities)];
+            if (step.header.schema) lines.push('schema  : ' + step.header.schema);
+            if (step.header.file_name) lines.push('header  : ' + step.header.file_name);
+            showMeta(lines);
+            return;
+        }
+
+        metaEl.textContent = 'Unsupported format: .' + e;
+    }
+
+    function loadFile(file) {
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () { loadBuffer(file.name, reader.result); };
+        reader.onerror = function () { metaEl.textContent = 'Could not read file.'; };
+        reader.readAsArrayBuffer(file);
+    }
+
+    document.getElementById('pick').addEventListener('click', function () { fileInput.click(); });
+    fileInput.addEventListener('change', function () {
+        loadFile(fileInput.files && fileInput.files[0]);
+    });
+    document.getElementById('reset').addEventListener('click', function () { location.reload(); });
+
+    /* ?src=/path/to/model.stl lets the server point the viewer at a submission. */
+    var src = new URLSearchParams(location.search).get('src');
+    if (src) {
+        fetch(src, { credentials: 'same-origin' })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); })
+            .then(function (buf) { loadBuffer(src, buf); })
+            .catch(function (err) { metaEl.textContent = 'Failed to load ' + src + ': ' + err.message; });
+    }
+})();
+</script>
+</body>
+</html>

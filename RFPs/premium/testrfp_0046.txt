@@ -1,0 +1,9 @@
+RFP ID: testrfp_0046
+Owner: meridian3d
+Title: Prop Pack #975
+Short Description: 3ds Max Prop Pack for a startup.
+Long Description: Low-poly game-ready models with clean topology and baked normals. Estimated effort: 100 hours.
+Budget: 1200.00
+Tier: premium
+Project Type: game-modeling
+Program: 3ds Max

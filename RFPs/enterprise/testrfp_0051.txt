@@ -1,0 +1,9 @@
+RFP ID: testrfp_0051
+Owner: forge_and_line
+Title: Locomotion Set #479
+Short Description: Adobe Animate Locomotion Set for a supplier.
+Long Description: Rig and animate a 6-clip locomotion set compatible with the provided skeleton. Estimated effort: 232 hours.
+Budget: 24000.00
+Tier: enterprise
+Project Type: game-animation
+Program: Adobe Animate

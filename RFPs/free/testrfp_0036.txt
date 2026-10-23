@@ -1,0 +1,9 @@
+RFP ID: testrfp_0036
+Owner: forge_and_line
+Title: Prop Library #662
+Short Description: Substance Painter Prop Library for a studio.
+Long Description: PBR textures at 2K for a six-piece environment kit, tileable and optimised. Estimated effort: 200 hours.
+Budget: 1200.00
+Tier: free
+Project Type: game-texturing
+Program: Substance Painter

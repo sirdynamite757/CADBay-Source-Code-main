@@ -1,0 +1,9 @@
+RFP ID: testrfp_0018
+Owner: apex_cad
+Title: Landing Page #592
+Short Description: css Landing Page for a OEM.
+Long Description: Responsive marketing page with a contact form and basic analytics hooks. Estimated effort: 22 hours.
+Budget: 7500.00
+Tier: premium
+Project Type: webpage-development
+Program: css

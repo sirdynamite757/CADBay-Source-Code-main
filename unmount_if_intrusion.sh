@@ -69,7 +69,7 @@ if [ $? -eq 0 ]; then
     # e.g. MOUNT_POINTS=("/media/usb1" "/mnt/secure")
 
     # SENSITIVE_PATHS - files or paths to replace with a rickroll if unmounted
-    SENSITIVE_PATHS=("Body/sensitive.html")
+    SENSITIVE_PATHS=("Body/LoginRegister.html" , "Body/Models.html" , "Body/Settings.html")
 
     # attempt to unmount each mount point
     for mp in "${MOUNT_POINTS[@]}"; do

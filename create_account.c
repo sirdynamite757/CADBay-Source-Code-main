@@ -1,12 +1,54 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <sys/stat.h>
+#include <dirent.h>
 #include <openssl/hmac.h>
 #include <openssl/evp.h>
 
 #define MASTER_KEY "CADBayMasterKey2026"
 #define HEX_PAIRS 15        /* 15 byte-pairs = 30 hex chars */
-#define DB_FILE "credentials_hash.db"
+#define DB_FILE "psswd.db"
+#define ACCOUNTS_DIR "accdta"
+
+int username_exists(const char *username) {
+    DIR *dir = opendir(ACCOUNTS_DIR);
+    if (!dir) {
+        return 0;
+    }
+
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL) {
+        if (entry->d_type != DT_REG) continue;
+        if (!strstr(entry->d_name, ".txt")) continue;
+
+        char path[512];
+        snprintf(path, sizeof(path), "%s/%s", ACCOUNTS_DIR, entry->d_name);
+        FILE *f = fopen(path, "r");
+        if (!f) continue;
+
+        char line[512];
+        while (fgets(line, sizeof(line), f)) {
+            char stored_username[128] = {0};
+            char *p = strstr(line, "\"username\"");
+            if (p) {
+                if (sscanf(p, "\"username\" : \"%127[^\"]\"", stored_username) == 1 ||
+                    sscanf(p, "\"username\": \"%127[^\"]\"", stored_username) == 1) {
+                    if (strcmp(stored_username, username) == 0) {
+                        fclose(f);
+                        closedir(dir);
+                        return 1;
+                    }
+                }
+            }
+        }
+
+        fclose(f);
+    }
+    closedir(dir);
+    return 0;
+}
 
 /**
  * Compute HMAC-SHA256 hash for account creation
@@ -80,20 +122,10 @@ int create_account(const char *username, const char *password) {
         return 0;
     }
 
-    /* Check if username already exists */
-    FILE *db = fopen(DB_FILE, "r");
-    if (db) {
-        char line[512];
-        char stored_username[128];
-        while (fgets(line, sizeof(line), db)) {
-            int parsed = sscanf(line, "%*d:%127[^:]:", stored_username);
-            if (parsed == 1 && strcmp(stored_username, username) == 0) {
-                fprintf(stderr, "✗ Username already exists: %s\n", username);
-                fclose(db);
-                return 0;
-            }
-        }
-        fclose(db);
+    /* Check if username already exists in user data files */
+    if (username_exists(username)) {
+        fprintf(stderr, "✗ Username already exists: %s\n", username);
+        return 0;
     }
 
     /* Compute hash */
@@ -105,19 +137,37 @@ int create_account(const char *username, const char *password) {
 
     /* Get next account ID */
     int account_id = get_next_account_id();
+    char padded_id[21];
+    snprintf(padded_id, sizeof(padded_id), "%020d", account_id);
 
     /* Append to credentials database */
-    db = fopen(DB_FILE, "a");
+    FILE *db = fopen(DB_FILE, "a");
     if (!db) {
         perror("fopen database for append");
         return 0;
     }
 
-    fprintf(db, "%d:%s:%s\n", account_id, username, hash);
+    fprintf(db, "%s:%s\n", padded_id, hash);
     fclose(db);
 
+    /* Create user data file */
+    mkdir(ACCOUNTS_DIR, 0755);
+    char filepath[256];
+    sprintf(filepath, "%s/%s.txt", ACCOUNTS_DIR, padded_id);
+    FILE *f = fopen(filepath, "w");
+    if (f) {
+        fprintf(f, "{\n");
+        fprintf(f, "  \"id\": \"%s\",\n", padded_id);
+        fprintf(f, "  \"username\": \"%s\",\n", username);
+        fprintf(f, "  \"created\": \"%ld\",\n", time(NULL));
+        fprintf(f, "  \"premium\": false,\n");
+        fprintf(f, "  \"files\": []\n");
+        fprintf(f, "}\n");
+        fclose(f);
+    }
+
     printf("✓ Account created successfully\n");
-    printf("  Account ID: %d\n", account_id);
+    printf("  Account ID: %s\n", padded_id);
     printf("  Username: %s\n", username);
     printf("  Password hash: %s\n", hash);
     printf("  Note: Password is hashed and never stored in plaintext\n");

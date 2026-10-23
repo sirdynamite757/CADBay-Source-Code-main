@@ -1,0 +1,9 @@
+RFP ID: testrfp_0028
+Owner: forge_and_line
+Title: Pallet Rack #865
+Short Description: CATIA Pallet Rack for a startup.
+Long Description: Design a jig that holds the part within 0.2mm through the weld cycle. Estimated effort: 148 hours.
+Budget: 500.00
+Tier: free
+Project Type: industrial
+Program: CATIA

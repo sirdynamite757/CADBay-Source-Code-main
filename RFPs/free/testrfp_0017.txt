@@ -1,0 +1,9 @@
+RFP ID: testrfp_0017
+Owner: atlas_works
+Title: Packshot Set #944
+Short Description: KeyShot Packshot Set for a OEM.
+Long Description: Photoreal turntable at 1080p, 30fps, 10 seconds, with transparent background. Estimated effort: 49 hours.
+Budget: 1200.00
+Tier: free
+Project Type: product-visualization
+Program: KeyShot

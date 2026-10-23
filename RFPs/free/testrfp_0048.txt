@@ -1,0 +1,9 @@
+RFP ID: testrfp_0048
+Owner: atlas_works
+Title: Cinematic Cutscene #649
+Short Description: Houdini Cinematic Cutscene for a supplier.
+Long Description: Rig and animate a 6-clip locomotion set compatible with the provided skeleton. Estimated effort: 179 hours.
+Budget: 2500.00
+Tier: free
+Project Type: game-animation
+Program: Houdini

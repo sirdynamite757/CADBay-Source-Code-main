@@ -1,0 +1,9 @@
+RFP ID: testrfp_0019
+Owner: atlas_works
+Title: Data Prep #892
+Short Description: Other Data Prep for a supplier.
+Long Description: Scope described in the attached brief; priced as a fixed-fee milestone. Estimated effort: 10 hours.
+Budget: 12000.00
+Tier: free
+Project Type: other
+Program: Other

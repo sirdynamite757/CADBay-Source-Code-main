@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="./">
+    <link rel="stylesheet" href="ColorDefault.css">
+    <title>CADBay - Account Suspended</title>
+    <meta name="application-name" content="CADBay - accountSuspended">
+    <script src="dynamics.js"></script>
+</head>
+<body id="cadbay-accountsuspended" data-app="cadbay">
+    <div id="header"></div>
+    
+    <div style="display: flex;">
+        <div id="sidebar"></div>
+        
+        <main style="flex: 1; padding: 20px; text-align: center;">
+            <h1>Account Suspended</h1>
+            <p>Your account has been suspended by a moderator.</p>
+            <p>If you believe this is an error, please contact support.</p>
+        </main>
+    </div>
+    
+    <div id="footer"></div>
+    <div id="auth-container"></div>
+
+    <!-- Fragment loading is handled by dynamics.js. -->
+    <!--
+        function resolveFragmentUrl(path) {
+            if (/^(https?:)?\/\//i.test(path)) {
+                return path;
+            }
+            return new URL(path, window.location.href).href;
+        }
+
+        async function loadFragment(containerId, path) {
+            const url = resolveFragmentUrl(path);
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to load ${url}: ${response.status} ${response.statusText}`);
+            }
+            const html = await response.text();
+            const container = document.getElementById(containerId);
+            if (!container) {
+                throw new Error(`Fragment container "${containerId}" not found`);
+            }
+            container.innerHTML = html;
+            const scripts = Array.from(container.querySelectorAll('script'));
+            await Promise.all(scripts.map(old => {
+                const script = document.createElement('script');
+                Array.from(old.attributes).forEach(attr => script.setAttribute(attr.name, attr.value));
+                if (old.src) {
+                    script.async = false;
+                    script.src = old.src;
+                    return new Promise((resolve, reject) => {
+                        script.onload = resolve;
+                        script.onerror = () => reject(new Error(`Failed to load script ${old.src}`));
+                        old.parentNode.replaceChild(script, old);
+                    });
+                }
+                script.textContent = old.textContent;
+                old.parentNode.replaceChild(script, old);
+                return Promise.resolve();
+            }));
+        }
+
+        loadFragment('header', 'header.html');
+        loadFragment('sidebar', 'sidebar.html');
+        loadFragment('footer', 'footer.html');
+        loadFragment('auth-container', 'loginRegister.html');
+    </script> -->
+</body>
+</html>

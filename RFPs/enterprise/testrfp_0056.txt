@@ -1,0 +1,9 @@
+RFP ID: testrfp_0056
+Owner: forge_and_line
+Title: Combat Prototype #520
+Short Description: Godot Combat Prototype for a OEM.
+Long Description: Write a deterministic procedural generator for cave layouts with seeded runs. Estimated effort: 43 hours.
+Budget: 7500.00
+Tier: enterprise
+Project Type: game-programming
+Program: Godot

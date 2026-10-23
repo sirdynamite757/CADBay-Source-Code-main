@@ -1,0 +1,11 @@
+# Add this to your Apache config file /etc/apache2/sites-available/CADBay.conf
+# inside the <VirtualHost *:3000> block:
+
+ProxyPass "/api" "http://127.0.0.1:4000/api"
+ProxyPassReverse "/api" "http://127.0.0.1:4000/api"
+
+# Also enable the proxy modules:
+# sudo a2enmod proxy proxy_http
+
+# Then restart Apache:
+# sudo systemctl restart apache2

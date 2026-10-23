@@ -1,0 +1,7 @@
+these viewers are designed to allow confirmation and viewing of submissions in order to confirm correct code
+they will allow for viewiung and testing but not downloading, copy/pasting, screenshotting, cloud scraping, etc
+on submission any cad models will be converted to step files so that they can be opened by a generic custom viewer
+
+photos will be converted to a propritary format and run through a watermarking and anti-AI  program 
+
+code will be complied  and a pdf made of the file for readimng and will also be watermarked and anti-AI treated

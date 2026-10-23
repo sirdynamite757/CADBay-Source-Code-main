@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Support - CADBay</title>
+    <meta name="application-name" content="CADBay - Customer Support">
+    <link rel="stylesheet" href="colorDefault.css">
+    <script src="dynamics.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+
+    <main class="support-page">
+        <h1>Customer Support</h1>
+        <p>Tell us what happened and include enough detail for us to help.</p>
+
+        <form id="support-form" class="support-form">
+            <label for="support-reason">Reason</label>
+            <select id="support-reason" name="reason" required>
+                <option value="">Select a reason</option>
+                <option>Account problems</option>
+                <option>Login or password problems</option>
+                <option>Premium subscription</option>
+                <option>Bad RFPs or misleading listings</option>
+                <option>Code of conduct violation</option>
+                <option>Harassment or inappropriate content</option>
+                <option value="enterprise-inquiry">Enterprise inquiry</option>
+                <option value="job-request">Job request</option>
+                <option value="bug-bounty">Bug bounty report</option>
+                <option>Report a security concern</option>
+                <option>Technical problem</option>
+                <option>Other</option>
+            </select>
+
+            <label for="support-name">Name or username</label>
+            <input id="support-name" name="name" type="text" maxlength="128" autocomplete="name" required>
+
+            <label for="support-contact">Email or phone number</label>
+            <input id="support-contact" name="contact" type="text" maxlength="160" autocomplete="email tel" required>
+
+            <div id="support-rfp-fields" class="support-field">
+                <label for="support-rfp">RFP ID (optional)</label>
+                <input id="support-rfp" name="rfp_id" type="text" maxlength="128">
+            </div>
+
+            <label for="support-subject">Subject</label>
+            <input id="support-subject" name="subject" type="text" maxlength="160" required>
+
+            <div id="support-details-fields" class="support-field">
+                <label for="support-details">Details</label>
+                <textarea id="support-details" name="details" rows="8" maxlength="4000" required></textarea>
+            </div>
+
+            <fieldset id="job-request-fields" class="support-extra" hidden>
+                <legend>Job request</legend>
+                <label for="support-role">Role or type of work</label>
+                <input id="support-role" name="role" type="text" maxlength="160">
+                <label for="support-resume">Resume</label>
+                <input id="support-resume" name="resume" type="file" accept=".pdf,.doc,.docx">
+                <small>The resume will not be uploaded. Attach it manually to the email that opens.</small>
+            </fieldset>
+
+            <fieldset id="bug-bounty-fields" class="support-extra" hidden>
+                <legend>Bug bounty report</legend>
+                <label for="bug-severity">Supposed Severity</label>
+                <select id="bug-severity" name="severity">
+                    <option value="">Select severity</option>
+                    <option>Nuisance</option>
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                    <option>Critical</option>
+                </select>
+                <label for="bug-url">Affected page or endpoint</label>
+                <input id="bug-url" name="affected_url" type="url" maxlength="500">
+                <label for="bug-steps">Reproduction steps</label>
+                <textarea id="bug-steps" name="reproduction_steps" rows="5" maxlength="4000"></textarea>
+                <label for="bug-impact">Security impact</label>
+                <textarea id="bug-impact" name="impact" rows="4" maxlength="2000"></textarea>
+            </fieldset>
+
+            <fieldset id="enterprise-fields" class="support-extra" hidden>
+                <legend>Enterprise inquiry</legend>
+                <label for="enterprise-business">Business name</label>
+                <input id="enterprise-business" name="business_name" type="text" maxlength="200">
+                <label for="enterprise-account">Requested account number</label>
+                <input id="enterprise-account" name="requested_account_number" type="text" inputmode="numeric" maxlength="64">
+            </fieldset>
+
+            <button type="submit">Create support email</button>
+            <p id="support-message" role="status"></p>
+        </form>
+    </main>
+
+    <div id="footer"></div>
+
+    <script>
+        const reasonSelect = document.getElementById('support-reason');
+        const jobFields = document.getElementById('job-request-fields');
+        const bugFields = document.getElementById('bug-bounty-fields');
+        const enterpriseFields = document.getElementById('enterprise-fields');
+        const rfpFields = document.getElementById('support-rfp-fields');
+        const detailsFields = document.getElementById('support-details-fields');
+        const detailsInput = document.getElementById('support-details');
+        const updateReportFields = () => {
+            const isJobRequest = reasonSelect.value === 'job-request';
+            const isBugReport = reasonSelect.value === 'bug-bounty';
+            const isEnterpriseInquiry = reasonSelect.value === 'enterprise-inquiry';
+            const isRfpReport = reasonSelect.value === 'Bad RFPs or misleading listings';
+            jobFields.hidden = !isJobRequest;
+            bugFields.hidden = !isBugReport;
+            enterpriseFields.hidden = !isEnterpriseInquiry;
+            rfpFields.hidden = !isRfpReport;
+            detailsFields.hidden = isBugReport;
+            document.getElementById('support-resume').required = isJobRequest;
+            document.getElementById('bug-severity').required = isBugReport;
+            document.getElementById('bug-steps').required = isBugReport;
+            document.getElementById('bug-impact').required = isBugReport;
+            document.getElementById('enterprise-business').required = isEnterpriseInquiry;
+            document.getElementById('enterprise-account').required = isEnterpriseInquiry;
+            detailsInput.required = !isBugReport;
+        };
+        reasonSelect.addEventListener('change', updateReportFields);
+        updateReportFields();
+
+        document.getElementById('support-form').addEventListener('submit', event => {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const message = document.getElementById('support-message');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const values = new FormData(form);
+            const reason = values.get('reason');
+            const subject = `[CADBay Support] ${reason}: ${values.get('subject')}`;
+            const resume = values.get('resume');
+            const body = [
+                `Reason: ${reason}`,
+                `Name or username: ${values.get('name')}`,
+                `Email or phone: ${values.get('contact')}`,
+                `RFP ID: ${values.get('rfp_id') || 'Not provided'}`,
+                `Role: ${values.get('role') || 'Not provided'}`,
+                `Resume: ${resume && resume.name ? `${resume.name} (attach manually)` : 'Not provided'}`,
+                `Bug severity: ${values.get('severity') || 'Not provided'}`,
+                `Affected page or endpoint: ${values.get('affected_url') || 'Not provided'}`,
+                `Reproduction steps: ${values.get('reproduction_steps') || 'Not provided'}`,
+                `Security impact: ${values.get('impact') || 'Not provided'}`,
+                `Business name: ${values.get('business_name') || 'Not provided'}`,
+                `Requested account number: ${values.get('requested_account_number') || 'Not provided'}`,
+                '',
+                values.get('details')
+            ].join('\n');
+            window.location.href = `mailto:support@cadbay.net?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            message.textContent = 'Your mail client should open with the support request prepared.';
+        });
+    </script>
+</body>
+</html>

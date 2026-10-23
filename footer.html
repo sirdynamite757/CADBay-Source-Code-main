@@ -1,0 +1,43 @@
+<footer class="site-footer">
+  <p>&copy; 2024-2026 CADBay. All rights reserved.</p>
+  <nav class="footer-nav" aria-label="Footer navigation">
+    <a href="/index" class="link">Homepage</a>
+    <a href="/browseRFPs" class="link">Browse RFPs</a>
+    <a href="/customer-Support" class="link">Support</a>
+    <a href="/tos" class="link">Terms of Service</a>
+    <a href="/settings" class="link">Settings</a>
+    <a href="https://github.com/sirdynamite757/CADBay-Source-Code" class="link" target="_blank" rel="noreferrer">Source Code</a>
+    <!-- Shown only to moderator and developer accounts. The page itself is
+         gated server-side, so hiding this link is cosmetic only. -->
+    <a href="/+Reports.html" class="link mod-footer-link" hidden>Reports</a>
+  </nav>
+  <script>
+    // The footer is injected as a fragment, so this runs wherever it is loaded.
+    // getSessionData() is defined in header.html; fall back to local storage if
+    // the footer is used on a page without the header fragment.
+    (function () {
+        const MOD_ROLES = ['mod', 'moderator', 'admin', 'dev', 'developer'];
+
+        function currentUser() {
+            if (typeof getSessionData === 'function') return getSessionData();
+            try {
+                const raw = localStorage.getItem('cadbay_user_data');
+                return raw ? JSON.parse(raw) : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function roleOf(user) {
+            if (!user) return '';
+            const premium = String(user.premium == null ? '' : user.premium).trim().toLowerCase();
+            if (premium === 'dev' || premium === 'developer') return 'dev';
+            return String(user.status || user.account_status || user.accountStatus || '')
+                .trim().toLowerCase();
+        }
+
+        const link = document.querySelector('.mod-footer-link');
+        if (link) link.hidden = !MOD_ROLES.includes(roleOf(currentUser()));
+    })();
+  </script>
+</footer>

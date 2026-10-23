@@ -1,0 +1,9 @@
+RFP ID: testrfp_0006
+Owner: forge_and_line
+Title: Character PBR Set #476
+Short Description: Substance Painter Character PBR Set for a studio.
+Long Description: Three material variants of a weapon skin using the provided UV layout. Estimated effort: 72 hours.
+Budget: 12000.00
+Tier: premium
+Project Type: game-texturing
+Program: Substance Painter

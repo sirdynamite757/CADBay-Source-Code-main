@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="application-name" content="CADBay - Create RFP">
+    <title>Create RFP - CADBay</title>
+    <link rel="stylesheet" href="colorDefault.css">
+    <script src="api-config.js"></script>
+    <script src="dynamics.js"></script>
+</head>
+<body id="cadbay-create-rfp" data-app="cadbay">
+    <div id="header"></div>
+
+    <main style="padding: 24px; max-width: 800px; margin: 0 auto;">
+        <h1>Create New RFP</h1>
+        <p>Submit a Request for Proposal for CAD work.</p>
+
+        <form id="rfp-form" enctype="multipart/form-data" method="post" action="/api/create-rfp">
+            <input type="hidden" name="creator_name" id="creator-name">
+            <div class="form-group">
+                <label for="project-name">Project Name:</label>
+                <input type="text" id="project-name" name="project_name" required maxlength="100">
+            </div>
+            <!-- dropdown for project type -->
+            <div class="form-group">
+                <label for="project-type">Project Type:</label>
+                <select id="project-type" name="project_type" required>
+                    <option value="">Select a project type</option>
+                    <option value="architectural">Architectural</option>
+                    <option value="engineering">Engineering</option>
+                    <option value="industrial">Industrial</option>
+                    <option value="product-visualization">Product Visualization</option>
+                    <option value="webpage-development">Webpage Development</option>
+                    <option value="game-programming">Game Programming</option>
+                    <option value="tool-programming">Tool Programming</option>
+                    <option value="game-texturing">Game Texturing</option>
+                    <option value="game-modeling">Game Modeling</option>
+                    <option value="game-animation">Game Animation</option>
+                    <option value="stock-images">Stock Images</option>
+                    <option value="other">Other</option>
+                    <!-- if other then add box for type and icon selector-->
+                </select>
+            </div>
+            <!-- for each type show language, model type, or file type-->
+             <!-- i will provide a json with nested options, prepare to call the available options-->
+            <dialog id="additional-options-dialog">
+                <p>Additional options for the selected project type will appear here.</p>
+                <button id="close-dialog">Close</button>
+            </dialog>
+
+
+            <script> 
+            filePath = './rfp-options.json';
+            fetch(filePath)
+                .then(response => response.json())
+                .then(data => {
+                    const projectTypeSelect = document.getElementById('project-type');
+                    projectTypeSelect.addEventListener('change', function() {
+                        const selectedType = this.value;
+                        const optionsContainer = document.getElementById('additional-options');
+                        optionsContainer.innerHTML = ''; // Clear previous options
+                        if (data[selectedType]) {
+                            data[selectedType].forEach(option => {
+                                const label = document.createElement('label');
+                                label.textContent = option.label;
+                                const select = document.createElement('select');
+                                select.name = option.name;
+                                option.values.forEach(value => {
+                                    const opt = document.createElement('option');
+                                    opt.value = value;
+                                    opt.textContent = value;
+                                    select.appendChild(opt);
+                                });
+                                const div = document.createElement('div');
+                                div.className = 'form-group';
+                                div.appendChild(label);
+                                div.appendChild(select);
+                                optionsContainer.appendChild(div);
+                            });
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading RFP options:', error));
+
+            </script>
+            
+             <div id="additional-options"></div>
+
+            </div>
+            <div class="form-group">
+                <label for="short-description">Short Description:</label>
+                <textarea id="short-description" name="short_description" required maxlength="200" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="long-description">Long Description:</label>
+                <textarea id="long-description" name="long_description" required maxlength="2000" rows="8"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="proposed-price">Proposed Price ($):</label>
+                <input type="number" id="proposed-price" name="proposed_price" required min="0" step="0.01">
+            </div>
+
+            <div class="form-group">
+                <label>Images (up to 3):</label>
+                <input type="file" name="image1" accept="image/*">
+                <input type="file" name="image2" accept="image/*">
+                <input type="file" name="image3" accept="image/*">
+            </div>
+
+            <button type="submit" class="auth-submit-btn">Create RFP</button>
+        </form>
+
+        <div id="message" class="auth-message" style="display: none;"></div>
+    </main>
+
+    <div id="footer"></div>
+
+    <script>
+
+        function resolveFragmentUrl(path) {
+            if (/^(https?:)?\/\//i.test(path)) {
+                return path;
+            }
+            return new URL(path, window.location.href).href;
+        }
+
+        async function loadFragment(containerId, path) {
+            const url = resolveFragmentUrl(path);
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to load ${url}: ${response.status} ${response.statusText}`);
+            }
+            const html = await response.text();
+            const container = document.getElementById(containerId);
+            if (!container) {
+                throw new Error(`Fragment container "${containerId}" not found`);
+            }
+            container.innerHTML = html;
+            const scripts = Array.from(container.querySelectorAll('script'));
+            await Promise.all(scripts.map(old => {
+                const script = document.createElement('script');
+                Array.from(old.attributes).forEach(attr => script.setAttribute(attr.name, attr.value));
+                if (old.src) {
+                    script.async = false;
+                    script.src = old.src;
+                    return new Promise((resolve, reject) => {
+                        script.onload = resolve;
+                        script.onerror = () => reject(new Error(`Failed to load script ${old.src}`));
+                        old.parentNode.replaceChild(script, old);
+                    });
+                }
+                script.textContent = old.textContent;
+                old.parentNode.replaceChild(script, old);
+                return Promise.resolve();
+            }));
+        }
+
+        loadFragment('header', 'header.html').then(() => {
+            if (typeof initializeDarkMode === 'function') initializeDarkMode();
+            if (typeof updateAccountMenu === 'function') updateAccountMenu();
+            return loadFragment('footer', 'footer.html');
+        }).catch(error => console.error('Failed to load fragments:', error));
+
+        // Form submission
+        document.getElementById('rfp-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const messageDiv = document.getElementById('message');
+            const showMessage = (className, text) => {
+                if (!messageDiv) return;
+                messageDiv.className = 'auth-message ' + className;
+                messageDiv.textContent = text;
+                messageDiv.style.display = 'block';
+            };
+
+            // Re-check the session with the same rule the rest of the site uses.
+            // If it has lapsed while the page was open, stay on this page and
+            // say so rather than letting the request fail with raw JSON.
+            if (!getSessionUser()) {
+                showMessage('error', '✗ Your session has expired. Please log in again.');
+                return;
+            }
+
+            const formData = new FormData(this);
+            try {
+                const response = await fetch(cadbayApiUrl('/create-rfp'), {
+                    method: 'POST',
+                    body: formData
+                });
+
+                // The endpoint may answer with JSON or with plain text; read the
+                // body once as text so a non-JSON error cannot throw here and
+                // leave the user looking at a blank page.
+                const raw = await response.text();
+                let result = null;
+                try { result = JSON.parse(raw); } catch (error) { result = null; }
+
+                if (response.ok && result && result.success) {
+                    showMessage('success', '✓ RFP created successfully!');
+                    setTimeout(() => window.location.href = '/my-rfps', 2000);
+                } else {
+                    showMessage('error', '✗ ' + ((result && result.message) || raw || 'Failed to create RFP'));
+                }
+            } catch (err) {
+                showMessage('error', '✗ Connection error: ' + err.message);
+            }
+        });
+
+        // Resolve the signed-in user the same way the header does. A missing
+        // expiry is treated as "no expiry recorded" rather than "logged out",
+        // so an otherwise valid session is not rejected on this page alone.
+        function getSessionUser() {
+            if (typeof getSessionData === 'function') {
+                return getSessionData();
+            }
+            const raw = localStorage.getItem('cadbay_user_data');
+            if (!raw) return null;
+            try {
+                const parsed = JSON.parse(raw);
+                const expiry = parseInt(localStorage.getItem('cadbay_session_expires'), 10);
+                if (!Number.isNaN(expiry) && Date.now() > expiry) return null;
+                return parsed && parsed.user_id ? parsed : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        // Check login
+        const user = getSessionUser();
+        if (!user) {
+            window.location.href = '/loginRegister';
+        } else {
+            const creatorField = document.getElementById('creator-name');
+            if (creatorField) creatorField.value = user.username || user.user_id;
+        }
+    </script>
+
+    <div id="footer"></div>
+</body>
+</html>

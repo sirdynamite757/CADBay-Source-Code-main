@@ -1,0 +1,9 @@
+RFP ID: testrfp_0007
+Owner: atlas_works
+Title: Character PBR Set #969
+Short Description: Blender Character PBR Set for a OEM.
+Long Description: PBR textures at 2K for a six-piece environment kit, tileable and optimised. Estimated effort: 121 hours.
+Budget: 7500.00
+Tier: free
+Project Type: game-texturing
+Program: Blender

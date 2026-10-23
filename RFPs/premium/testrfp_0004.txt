@@ -1,0 +1,9 @@
+RFP ID: testrfp_0004
+Owner: forge_and_line
+Title: Save Load Layer #996
+Short Description: GameMaker Studio Save Load Layer for a indie team.
+Long Description: Write a deterministic procedural generator for cave layouts with seeded runs. Estimated effort: 73 hours.
+Budget: 250.00
+Tier: premium
+Project Type: game-programming
+Program: GameMaker Studio

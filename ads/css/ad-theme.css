@@ -1,0 +1,30 @@
+.ad-theme-light {
+    background-color: #ffffff;
+    color: #111111;
+}
+
+.ad-theme-light a {
+    color: #0077cc;
+}
+
+.ad-theme-dark {
+    background-color: #131313;
+    color: #f4f4f4;
+}
+
+.ad-theme-dark a {
+    color: #6fb8ff;
+}
+
+.ad-theme-sith {
+    background-color: #24070b;
+    color: #ffe9e9;
+}
+
+.ad-theme-sith a {
+    color: #ff6670;
+}
+
+#ad-content {
+    min-height: 200px;
+}

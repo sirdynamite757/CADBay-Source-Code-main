@@ -1,0 +1,9 @@
+RFP ID: testrfp_0009
+Owner: skynet_labs
+Title: Netcode Spike #329
+Short Description: Unreal Engine Netcode Spike for a startup.
+Long Description: Implement a data-driven inventory with stacking, tooltips and persistence. Estimated effort: 86 hours.
+Budget: 7500.00
+Tier: free
+Project Type: game-programming
+Program: Unreal Engine

@@ -1,0 +1,9 @@
+RFP ID: testrfp_0026
+Owner: blueorbit
+Title: Pallet Rack #308
+Short Description: Creo Pallet Rack for a startup.
+Long Description: Lay out the full line with clearance envelopes and an interference check report. Estimated effort: 44 hours.
+Budget: 1200.00
+Tier: free
+Project Type: industrial
+Program: Creo

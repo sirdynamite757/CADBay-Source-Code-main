@@ -1,0 +1,9 @@
+RFP ID: testrfp_0053
+Owner: nova_design
+Title: AR Asset #520
+Short Description: V-Ray AR Asset for a startup.
+Long Description: Photoreal turntable at 1080p, 30fps, 10 seconds, with transparent background. Estimated effort: 135 hours.
+Budget: 2500.00
+Tier: premium
+Project Type: product-visualization
+Program: V-Ray

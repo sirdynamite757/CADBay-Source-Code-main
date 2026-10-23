@@ -1,0 +1,60 @@
+// Create socket
+if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+    perror("socket failed");
+    exit(EXIT_FAILURE);
+}
+
+// Set socket options
+int opt = 1;
+if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
+    perror("setsockopt failed");
+    exit(EXIT_FAILURE);
+}
+
+// Configure server address
+server_addr.sin_family = AF_INET;
+server_addr.sin_addr.s_addr = INADDR_ANY;
+server_addr.sin_port = htons(PORT);
+
+// Bind socket
+if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+    perror("bind failed");
+    exit(EXIT_FAILURE);
+}
+
+// Listen for connections
+if (listen(server_fd, 3) < 0) {
+    perror("listen failed");
+    exit(EXIT_FAILURE);
+}
+
+printf("CADBay Web Server started on port %d\n", PORT);
+
+// Main server loop
+while (1) {
+    // Accept client connection
+    if ((client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_len)) < 0) {
+        perror("accept failed");
+        continue;
+    }
+    
+    // Create thread to handle client
+    if (pthread_create(&thread_id, NULL, handle_client, (void*)&client_fd) != 0) {
+        perror("pthread_create failed");
+        close(client_fd);
+        continue;
+    }
+    
+    // Detach thread to avoid resource leaks
+    pthread_detach(thread_id);
+}
+
+// Close server socket (this won't be reached)
+close(server_fd);
+return 0;
+
+
+
+
+
+

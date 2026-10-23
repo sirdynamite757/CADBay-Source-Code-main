@@ -1,0 +1,9 @@
+RFP ID: testrfp_0033
+Owner: nova_design
+Title: Hydraulic Manifold #476
+Short Description: NX Hydraulic Manifold for a indie team.
+Long Description: Reverse engineer an existing part and produce a watertight STEP exchange model. Estimated effort: 68 hours.
+Budget: 250.00
+Tier: free
+Project Type: engineering
+Program: NX

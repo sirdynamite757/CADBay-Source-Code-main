@@ -1,0 +1,9 @@
+RFP ID: testrfp_0039
+Owner: skynet_labs
+Title: Weapon Set #415
+Short Description: Blender Weapon Set for a supplier.
+Long Description: Three material variants of a weapon skin using the provided UV layout. Estimated effort: 136 hours.
+Budget: 12000.00
+Tier: premium
+Project Type: game-texturing
+Program: Blender

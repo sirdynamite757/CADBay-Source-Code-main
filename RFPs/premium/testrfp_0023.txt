@@ -1,0 +1,9 @@
+RFP ID: testrfp_0023
+Owner: forge_and_line
+Title: Prop Pack #217
+Short Description: ZBrush Prop Pack for a studio.
+Long Description: Modular wall set with 12 snap-together pieces, under 40k tris each. Estimated effort: 163 hours.
+Budget: 1200.00
+Tier: premium
+Project Type: game-modeling
+Program: ZBrush

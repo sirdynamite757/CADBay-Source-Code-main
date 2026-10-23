@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CADBay — Image Submission Viewer</title>
+<style>
+  :root { --bg:#101010; --panel:#181818; --accent:#dd0000; --fg:#eaeaea; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg);
+         font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+         user-select:none; -webkit-user-select:none; }
+  header { display:flex; align-items:center; gap:12px; padding:10px 16px;
+           background:var(--panel); border-bottom:1px solid #2a2a2a; }
+  header h1 { font-size:15px; margin:0; font-weight:600; }
+  header .tag { font-size:11px; color:#999; }
+  .wrap { display:flex; height:calc(100vh - 49px); }
+  #stage { flex:1; position:relative; display:flex; align-items:center;
+           justify-content:center; overflow:hidden; background:#0b0b0b; }
+  #pic { max-width:100%; max-height:100%; display:none;
+         -webkit-user-drag:none; pointer-events:none; }
+  aside { width:300px; background:var(--panel); border-left:1px solid #2a2a2a;
+          padding:14px; overflow:auto; }
+  aside h2 { font-size:12px; text-transform:uppercase; letter-spacing:.08em;
+             color:#8a8a8a; margin:0 0 8px; }
+  .row { margin-bottom:12px; }
+  button { background:#222; color:var(--fg); border:1px solid #333;
+           border-radius:6px; padding:7px 10px; font:inherit; cursor:pointer; }
+  button:hover { border-color:var(--accent); }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  input[type=file] { display:none; }
+  #meta { font:12px/1.6 ui-monospace,Menlo,Consolas,monospace; color:#bbb;
+          white-space:pre-wrap; word-break:break-word; }
+  .note { font-size:11px; color:#777; border-top:1px solid #2a2a2a; padding-top:10px; }
+  .badge { display:inline-block; font-size:10px; padding:2px 6px; border-radius:4px;
+           background:#2a1010; color:#ff8080; border:1px solid #5a2020; }
+  #empty { color:#666; font-size:13px; text-align:center; padding:20px; }
+  #zoomrow { display:flex; gap:6px; align-items:center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>CADBay Image Submission Viewer</h1>
+  <span class="tag" id="subtag">no submission loaded</span>
+  <span class="badge">view-only</span>
+</header>
+
+<div class="wrap">
+  <div id="stage">
+    <div id="empty">Load a submission to view it.<br>Supports .cbv (protected) and standard images.</div>
+    <img id="pic" alt="submission preview" draggable="false">
+  </div>
+
+  <aside>
+    <h2>Submission</h2>
+    <div class="row"><input type="file" id="file" accept=".cbv,.png,.jpg,.jpeg,.webp,.gif">
+      <button class="primary" id="pick">Choose file…</button></div>
+
+    <h2>View</h2>
+    <div class="row" id="zoomrow">
+      <button id="zin">Zoom +</button>
+      <button id="zout">Zoom −</button>
+      <button id="zreset">Reset</button>
+    </div>
+
+    <h2>Details</h2>
+    <div id="meta">—</div>
+
+    <div class="note">
+      Viewing only. Downloading, copying, screenshotting and scraping are
+      prohibited. Protected submissions are watermarked and traceable to the
+      viewer and time they were opened.
+    </div>
+  </aside>
+</div>
+
+<script src="deter.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var pic = document.getElementById('pic');
+    var metaEl = document.getElementById('meta');
+    var subTag = document.getElementById('subtag');
+    var emptyEl = document.getElementById('empty');
+    var fileInput = document.getElementById('file');
+    var zoom = 1;
+
+    function basename(p) { return (p || '').split(/[\\/]/).pop(); }
+    function ext(p) { var m = /\.([a-z0-9]+)$/i.exec(p || ''); return m ? m[1].toLowerCase() : ''; }
+    function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+    function applyZoom() {
+        pic.style.transform = 'scale(' + zoom + ')';
+    }
+
+    function showMeta(lines) { metaEl.textContent = lines.join('\n'); }
+
+    /*
+     * Decode the proprietary CADBay image format (.cbv).
+     *
+     * Layout (all big-endian, written by cadbay_image.c):
+     *   magic   : "CBV1"                (4 bytes)
+     *   width   : uint32
+     *   height  : uint32
+     *   salt    : uint32                (keystream seed)
+     *   pixels  : width*height*4 bytes  RGBA, XOR-obfuscated
+     *
+     * The pixels are de-obfuscated with the same LCG keystream the encoder
+     * used. This is deliberately lightweight obfuscation + watermarking, not
+     * real encryption: the goal is to stop casual "save image as" and to bind
+     * a visible watermark into the payload, not to resist a determined user.
+     */
+    function decodeCBV(buffer) {
+        var bytes = new Uint8Array(buffer);
+        if (bytes.length < 16) throw new Error('file too small');
+        if (!(bytes[0] === 0x43 && bytes[1] === 0x42 && bytes[2] === 0x56 && bytes[3] === 0x31)) {
+            throw new Error('not a CBV file (bad magic)');
+        }
+        var dv = new DataView(buffer);
+        var w = dv.getUint32(4, false);
+        var h = dv.getUint32(8, false);
+        var salt = dv.getUint32(12, false);
+        var need = 16 + w * h * 4;
+        if (bytes.length < need) throw new Error('truncated CBV payload');
+
+        var out = new Uint8ClampedArray(w * h * 4);
+        var state = salt >>> 0;
+        for (var i = 0; i < w * h * 4; i++) {
+            // 32-bit LCG (Numerical Recipes constants), must match the encoder.
+            state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+            out[i] = bytes[16 + i] ^ (state >>> 24);
+        }
+
+        var canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        var ctx = canvas.getContext('2d');
+        ctx.putImageData(new ImageData(out, w, h), 0, 0);
+        return { dataURL: canvas.toDataURL('image/png'), width: w, height: h };
+    }
+
+    function showDataURL(url, lines) {
+        pic.src = url;
+        pic.style.display = 'block';
+        emptyEl.style.display = 'none';
+        zoom = 1;
+        applyZoom();
+        showMeta(lines);
+    }
+
+    function loadBuffer(name, buffer) {
+        var e = ext(name);
+        var id = basename(name);
+        subTag.textContent = id;
+        CADBayDeter.setWatermark(CADBayDeter.makeMark(id));
+
+        if (e === 'cbv') {
+            try {
+                var dec = decodeCBV(buffer);
+                showDataURL(dec.dataURL, [
+                    'file    : ' + id,
+                    'format  : CBV (protected)',
+                    'size    : ' + dec.width + ' × ' + dec.height,
+                    'watermark: embedded + overlay'
+                ]);
+            } catch (err) {
+                metaEl.textContent = 'Could not decode CBV: ' + err.message;
+            }
+            return;
+        }
+
+        if (['png', 'jpg', 'jpeg', 'webp', 'gif'].indexOf(e) >= 0) {
+            var blob = new Blob([buffer]);
+            var url = URL.createObjectURL(blob);
+            var img = new Image();
+            img.onload = function () {
+                showDataURL(url, [
+                    'file    : ' + id,
+                    'format  : ' + e.toUpperCase(),
+                    'size    : ' + img.naturalWidth + ' × ' + img.naturalHeight,
+                    'watermark: overlay only (unprotected source)'
+                ]);
+            };
+            img.onerror = function () { metaEl.textContent = 'Could not display image.'; };
+            img.src = url;
+            return;
+        }
+
+        metaEl.textContent = 'Unsupported format: .' + e;
+    }
+
+    function loadFile(file) {
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () { loadBuffer(file.name, reader.result); };
+        reader.onerror = function () { metaEl.textContent = 'Could not read file.'; };
+        reader.readAsArrayBuffer(file);
+    }
+
+    document.getElementById('pick').addEventListener('click', function () { fileInput.click(); });
+    fileInput.addEventListener('change', function () {
+        loadFile(fileInput.files && fileInput.files[0]);
+    });
+    document.getElementById('zin').addEventListener('click', function () { zoom = Math.min(6, zoom * 1.25); applyZoom(); });
+    document.getElementById('zout').addEventListener('click', function () { zoom = Math.max(0.25, zoom / 1.25); applyZoom(); });
+    document.getElementById('zreset').addEventListener('click', function () { zoom = 1; applyZoom(); });
+
+    var src = new URLSearchParams(location.search).get('src');
+    if (src) {
+        fetch(src, { credentials: 'same-origin' })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); })
+            .then(function (buf) { loadBuffer(src, buf); })
+            .catch(function (err) { metaEl.textContent = 'Failed to load ' + src + ': ' + err.message; });
+    }
+})();
+</script>
+</body>
+</html>

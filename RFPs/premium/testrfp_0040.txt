@@ -1,0 +1,9 @@
+RFP ID: testrfp_0040
+Owner: hexbolt
+Title: 3D Viewer Widget #486
+Short Description: css 3D Viewer Widget for a startup.
+Long Description: Build an embeddable widget that loads a glTF model and exposes orbit controls. Estimated effort: 196 hours.
+Budget: 7500.00
+Tier: premium
+Project Type: webpage-development
+Program: css

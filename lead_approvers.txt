@@ -1,0 +1,18 @@
+# Lead approvers
+#
+# Account ids listed here may approve an RFP on their own, without a second
+# moderator. Everyone else with moderation rights needs a second, different
+# moderator to complete an approval.
+#
+# One numeric account id per line. Blank lines and lines beginning with '#' are
+# ignored. The file is read on every decision, so changes take effect straight
+# away without rebuilding or restarting the server.
+#
+# Account ids correspond to the account files in the accounts directory
+# (for example 00000000000000000005.txt -> 00000000000000000005).
+#
+# Developers may also approve alone regardless of this list, so the queue
+# cannot become stuck if the registry is missing.
+#
+# Example:
+# 00000000000000000005

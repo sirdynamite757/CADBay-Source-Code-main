@@ -1,0 +1,9 @@
+RFP ID: testrfp_0025
+Owner: forge_and_line
+Title: Batch Renamer #895
+Short Description: Unreal Engine Batch Renamer for a startup.
+Long Description: Editor extension that validates naming conventions across the asset database. Estimated effort: 71 hours.
+Budget: 24000.00
+Tier: enterprise
+Project Type: tool-programming
+Program: Unreal Engine

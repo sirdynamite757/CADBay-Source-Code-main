@@ -1,0 +1,9 @@
+RFP ID: testrfp_0037
+Owner: blueorbit
+Title: Portfolio Site #590
+Short Description: html Portfolio Site for a OEM.
+Long Description: Build an embeddable widget that loads a glTF model and exposes orbit controls. Estimated effort: 77 hours.
+Budget: 1200.00
+Tier: free
+Project Type: webpage-development
+Program: html

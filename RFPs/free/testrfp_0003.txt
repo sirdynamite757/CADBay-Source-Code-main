@@ -1,0 +1,9 @@
+RFP ID: testrfp_0003
+Owner: forge_and_line
+Title: Loft Conversion #461
+Short Description: ArchiCAD Loft Conversion for a indie team.
+Long Description: Produce a 3D model plus plan and elevation sheets suitable for a planning submission. Estimated effort: 94 hours.
+Budget: 500.00
+Tier: free
+Project Type: architectural
+Program: ArchiCAD

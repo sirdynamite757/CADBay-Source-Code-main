@@ -1,0 +1,9 @@
+RFP ID: testrfp_0045
+Owner: meridian3d
+Title: Prop Library #366
+Short Description: 3ds Max Prop Library for a OEM.
+Long Description: PBR textures at 2K for a six-piece environment kit, tileable and optimised. Estimated effort: 216 hours.
+Budget: 1200.00
+Tier: enterprise
+Project Type: game-texturing
+Program: 3ds Max

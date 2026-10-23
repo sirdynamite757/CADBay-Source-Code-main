@@ -1,0 +1,9 @@
+RFP ID: testrfp_0054
+Owner: skynet_labs
+Title: Blueprint Textures #668
+Short Description: svg Blueprint Textures for a studio.
+Long Description: 40 flat icons in SVG plus PNG exports at 256px and 512px. Estimated effort: 59 hours.
+Budget: 2500.00
+Tier: premium
+Project Type: stock-images
+Program: svg

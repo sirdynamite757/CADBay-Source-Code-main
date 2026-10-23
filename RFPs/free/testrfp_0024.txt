@@ -1,0 +1,9 @@
+RFP ID: testrfp_0024
+Owner: skynet_labs
+Title: Parts Catalog #746
+Short Description: javascript Parts Catalog for a supplier.
+Long Description: Responsive marketing page with a contact form and basic analytics hooks. Estimated effort: 222 hours.
+Budget: 12000.00
+Tier: free
+Project Type: webpage-development
+Program: javascript

@@ -1,0 +1,9 @@
+RFP ID: testrfp_0047
+Owner: cinder_studio
+Title: Build Pipeline Tool #809
+Short Description: Godot Build Pipeline Tool for a studio.
+Long Description: Editor extension that validates naming conventions across the asset database. Estimated effort: 96 hours.
+Budget: 7500.00
+Tier: premium
+Project Type: tool-programming
+Program: Godot

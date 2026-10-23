@@ -1,0 +1,307 @@
+<div id="login-register-container" class="auth-modal" style="display: none;">
+    <div class="auth-card">
+        <div class="auth-tabs">
+            <button class="auth-tab-btn active" data-tab="login">Login</button>
+            <button class="auth-tab-btn" data-tab="register">Register</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <div id="login-tab" class="auth-tab-content active">
+            <h2>Login to CADBay</h2>
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="login-username">Username:</label>
+                    <input type="text" id="login-username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password:</label>
+                    <input type="password" id="login-password" name="password" required>
+                </div>
+                <div id="login-message" class="auth-message"></div>
+                <button type="submit" class="auth-submit-btn">Login</button>
+            </form>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div id="register-tab" class="auth-tab-content">
+            <h2>Create New Account</h2>
+            <form id="register-form" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="register-username">Username:</label>
+                    <input type="text" id="register-username" name="username" required minlength="3">
+                    <small>3+ characters</small>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password:</label>
+                    <input type="password" id="register-password" name="password" required oninput="validatePassword()">
+                    <small>Must contain all of the following:</small>
+                    <div class="password-requirements">
+                        <div class="requirement" id="req-length">
+                            <span class="req-icon">○</span> 8+ characters
+                        </div>
+                        <div class="requirement" id="req-number">
+                            <span class="req-icon">○</span> Number (0-9)
+                        </div>
+                        <div class="requirement" id="req-lower">
+                            <span class="req-icon">○</span> Lowercase letter (a-z)
+                        </div>
+                        <div class="requirement" id="req-upper">
+                            <span class="req-icon">○</span> Uppercase letter (A-Z)
+                        </div>
+                        <div class="requirement" id="req-special">
+                            <span class="req-icon">○</span> Special character (!@#$%^&*)
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm">Confirm Password:</label>
+                    <input type="password" id="register-confirm" name="confirm" required>
+                </div>
+                <div id="register-message" class="auth-message"></div>
+                <button type="submit" class="auth-submit-btn" id="register-submit" disabled>Create Account</button>
+            </form>
+        </div>
+
+        <button class="auth-close-btn" onclick="closeLoginRegister()">✕</button>
+    </div>
+</div>
+
+<script>
+// Password validation requirements
+const PASSWORD_REQUIREMENTS = {
+    length: { regex: /.{8,}/, id: 'req-length' },
+    number: { regex: /[0-9]/, id: 'req-number' },
+    lower: { regex: /[a-z]/, id: 'req-lower' },
+    upper: { regex: /[A-Z]/, id: 'req-upper' },
+    special: { regex: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, id: 'req-special' }
+};
+
+// Tab switching
+document.querySelectorAll('.auth-tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const tab = this.getAttribute('data-tab');
+        switchAuthTab(tab, this);
+    });
+});
+
+function switchAuthTab(tab, activeButton) {
+    // Hide all tabs
+    document.querySelectorAll('.auth-tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.querySelectorAll('.auth-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Show selected tab
+    document.getElementById(tab + '-tab').classList.add('active');
+    if (activeButton) activeButton.classList.add('active');
+
+    // Clear messages
+    document.getElementById('login-message').textContent = '';
+    document.getElementById('register-message').textContent = '';
+}
+
+// Validate password in real-time
+function validatePassword() {
+    const password = document.getElementById('register-password').value;
+    const confirmBtn = document.getElementById('register-submit');
+    const confirmPassword = document.getElementById('register-confirm').value;
+    let allMet = true;
+
+    for (let [key, requirement] of Object.entries(PASSWORD_REQUIREMENTS)) {
+        const element = document.getElementById(requirement.id);
+        const met = requirement.regex.test(password);
+        
+        if (met) {
+            element.classList.add('met');
+            element.querySelector('.req-icon').textContent = '✓';
+        } else {
+            element.classList.remove('met');
+            element.querySelector('.req-icon').textContent = '○';
+            allMet = false;
+        }
+    }
+
+    // Check if passwords match
+    const passwordsMatch = password === confirmPassword && password.length > 0;
+
+    confirmBtn.disabled = !(allMet && passwordsMatch);
+}
+
+// Real-time validation on confirm password
+document.getElementById('register-confirm').addEventListener('input', validatePassword);
+
+function openLoginRegister() {
+    document.getElementById('login-register-container').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLoginRegister() {
+    document.getElementById('login-register-container').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+//Json formatted userdata not json fromatted responses
+async function parseJsonOrText(response) {
+    const text = await response.text();
+    try {
+        return JSON.parse(text);
+    } catch (err) {
+        return { _rawText: text };
+    }
+}
+
+function getApiBaseUrl() {
+    return typeof window.cadbayApiUrl === 'function'
+        ? window.cadbayApiUrl('')
+        : window.location.origin;
+}
+
+function apiFetch(path, options = {}) {
+    const apiPath = path.startsWith('/api/') ? path.slice(4) : path;
+    return fetch(typeof cadbayApiUrl === 'function' ? cadbayApiUrl(apiPath) : path, {
+        credentials: 'include',
+        ...options
+    });
+}
+
+// Close on background click
+document.getElementById('login-register-container').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeLoginRegister();
+    }
+});
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeLoginRegister();
+    }
+});
+
+async function handleLogin(event) {
+    event.preventDefault();
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    const messageDiv = document.getElementById('login-message');
+
+    try {
+        // Send as form-urlencoded data (more reliable than JSON parsing)
+        const params = new URLSearchParams();
+        params.append('username', username);
+        params.append('password', password);
+
+        const response = await apiFetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
+        });
+
+        const result = await parseJsonOrText(response);
+
+        if (response.ok && result && result.success === true && result.user_id && !result._rawText) {
+            messageDiv.className = 'auth-message success';
+            messageDiv.textContent = '✓ Login successful! Redirecting...';
+            if (typeof window.persistLoginSession === 'function') {
+                window.persistLoginSession({
+                    user_id: result.user_id,
+                    username: username,
+                    premium: result.premium || '',
+                    status: result.status || result.account_status || '',
+                    account_status: result.account_status || result.status || ''
+                });
+            }
+            // Update account menu immediately if available
+            if (window.updateAccountMenu) {
+                window.updateAccountMenu();
+            }
+            setTimeout(() => {
+                closeLoginRegister();
+                location.reload();
+            }, 1500);
+        } else {
+            const errorMessage = (result && result.message) || (result && result.error) || (result && result._rawText) || 'Login failed';
+            messageDiv.className = 'auth-message error';
+            messageDiv.textContent = '✗ ' + errorMessage;
+        }
+    } catch (err) {
+        messageDiv.className = 'auth-message error';
+        messageDiv.textContent = '✗ Connection error: ' + err.message;
+    }
+}
+
+async function handleRegister(event) {
+    event.preventDefault();
+    const username = document.getElementById('register-username').value;
+    const password = document.getElementById('register-password').value;
+    const confirm = document.getElementById('register-confirm').value;
+    const messageDiv = document.getElementById('register-message');
+
+    if (password !== confirm) {
+        messageDiv.className = 'auth-message error';
+        messageDiv.textContent = '✗ Passwords do not match';
+        return;
+    }
+
+    try {
+        // Send as form-urlencoded data (more reliable than JSON parsing)
+        const params = new URLSearchParams();
+        params.append('username', username);
+        params.append('password', password);
+
+        const apiBase = getApiBaseUrl();
+        const response = await apiFetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
+        });
+
+        const result = await parseJsonOrText(response);
+
+        if (response.ok && result && result.success === true && result.user_id && !result._rawText) {
+            messageDiv.className = 'auth-message success';
+            messageDiv.textContent = '✓ Account created! Logging in...';
+            if (typeof window.persistLoginSession === 'function') {
+                window.persistLoginSession({
+                    user_id: result.user_id,
+                    username: username,
+                    status: result.status || result.account_status || '',
+                    account_status: result.account_status || result.status || ''
+                });
+            }
+            // Update account menu immediately if available
+            if (window.updateAccountMenu) {
+                window.updateAccountMenu();
+            }
+            setTimeout(() => {
+                closeLoginRegister();
+                location.reload();
+            }, 1500);
+        } else {
+            const errorMessage = (result && result.message) || (result && result.error) || (result && result._rawText) || 'Registration failed';
+            messageDiv.className = 'auth-message error';
+            messageDiv.textContent = '✗ ' + errorMessage;
+        }
+    } catch (err) {
+        messageDiv.className = 'auth-message error';
+        messageDiv.textContent = '✗ Connection error: ' + err.message;
+    }
+}
+
+// Check if user is already logged in
+function checkLoginStatus() {
+    if (typeof window.updateAccountMenu === 'function') {// if user is already logged in swap to account dropdown containing : dashboard, my RFPs, my projects, my discussions, logout
+        // Do something here, e.g., update the UI to show the account dropdown
+        window.updateAccountMenu();
+    }
+}
+
+
+
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', checkLoginStatus);
+
+// Also try to run immediately in case DOMContentLoaded already fired
+checkLoginStatus();
+</script>

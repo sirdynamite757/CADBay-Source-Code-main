@@ -1,0 +1,9 @@
+RFP ID: testrfp_0041
+Owner: hexbolt
+Title: Hard Surface Kit #853
+Short Description: 3ds Max Hard Surface Kit for a OEM.
+Long Description: Modular wall set with 12 snap-together pieces, under 40k tris each. Estimated effort: 102 hours.
+Budget: 7500.00
+Tier: premium
+Project Type: game-modeling
+Program: 3ds Max

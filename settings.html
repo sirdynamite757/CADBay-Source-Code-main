@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - CADBay</title>
+    <link rel="stylesheet" href="colorDefault.css">
+    <script src="api-config.js"></script>
+    <script src="dynamics.js"></script>
+    <script src="settings.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+
+    <main class="settings-page">
+        <h1>Settings</h1>
+        <p>Manage your account, contact details, security, and display preferences.</p>
+
+        <section class="settings-section">
+            <h2>Account</h2>
+            <p>Username: <span id="settings-username-display">Loading...</span></p>
+            <button type="button" id="change-username-button">Change Username</button>
+            <div id="change-username-form" style="display: none;">
+                <input type="text" id="new-username" placeholder="Enter new username">
+                <button type="button" id="submit-username-change">Submit</button>
+                <p id="username-change-message" role="status"></p>
+            </div>
+            <p id="premium-status">Premium status: loading...</p>
+            <p id="settings-account-message" role="status"></p>
+        </section>
+
+        <section class="settings-section settings-form">
+            <h2>Appearance</h2>
+            <label for="settings-theme">Color scheme</label>
+            <select id="settings-theme">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="sith">Sith</option>
+            </select>
+            <button type="button" id="save-theme">Save appearance</button>
+            <label id="dev-ads-setting" hidden>
+                <input type="checkbox" id="dev-ads-toggle">
+                Enable ads for this developer account
+            </label>
+            <p id="theme-message" role="status"></p>
+        </section>
+
+        <form id="profile-form" class="settings-section settings-form">
+            <h2>Contact and icon</h2>
+            <label for="settings-email">Email</label>
+            <input id="settings-email" type="email" maxlength="255" autocomplete="email">
+            <label for="settings-phone">Phone</label>
+            <input id="settings-phone" type="tel" maxlength="63" autocomplete="tel">
+            <label for="settings-icon">Account icon</label>
+            <div id="account-icon-picker" class="account-icon-picker" role="radiogroup" aria-label="Default account icons">Loading icons...</div>
+            <input id="settings-icon" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+            <small>Custom icons are available to premium members. Maximum size: 50 MB.</small>
+            <button type="submit">Save contact and icon</button>
+            <button type="button" id="remove-icon">Remove custom icon</button>
+            <p id="profile-message" role="status"></p>
+        </form>
+
+        <form id="password-form" class="settings-section settings-form">
+            <h2>Password</h2>
+            <label for="current-password">Current password</label>
+            <input id="current-password" type="password" autocomplete="current-password" required>
+            <label for="new-password">New password</label>
+            <input id="new-password" type="password" minlength="8" autocomplete="new-password" required>
+            <button type="submit">Change password</button>
+            <p id="password-message" role="status"></p>
+        </form>
+
+        <section class="settings-section danger-zone">
+            <h2>Security wipe</h2>
+            <p>Remove stored email, phone number, and custom icon from this account after a suspected breach.</p>
+            <button type="button" id="security-wipe">Wipe sensitive account data</button>
+            <p id="wipe-message" role="status"></p>
+        </section>
+    </main>
+
+    <div id="footer"></div>
+
+    
+</body>
+</html>

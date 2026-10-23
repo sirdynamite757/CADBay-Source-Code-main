@@ -1,0 +1,9 @@
+RFP ID: testrfp_0032
+Owner: forge_and_line
+Title: Retail Fit-out #998
+Short Description: Revit Retail Fit-out for a indie team.
+Long Description: Produce a 3D model plus plan and elevation sheets suitable for a planning submission. Estimated effort: 128 hours.
+Budget: 4800.00
+Tier: enterprise
+Project Type: architectural
+Program: Revit

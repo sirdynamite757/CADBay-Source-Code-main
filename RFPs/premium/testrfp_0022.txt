@@ -1,0 +1,9 @@
+RFP ID: testrfp_0022
+Owner: apex_cad
+Title: Weapon Set #454
+Short Description: Blender Weapon Set for a studio.
+Long Description: PBR textures at 2K for a six-piece environment kit, tileable and optimised. Estimated effort: 197 hours.
+Budget: 24000.00
+Tier: premium
+Project Type: game-texturing
+Program: Blender

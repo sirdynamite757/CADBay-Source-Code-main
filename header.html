@@ -1,0 +1,370 @@
+<header>
+    <title>CADBay</title>
+<script>
+// function to hide or show the ad toggle button for devs based on whether the user is a dev or not
+function updateDevAdsToggleVisibility() {
+    const userData = typeof getSessionData === 'function' ? getSessionData() : null;
+    const status = String(userData && (
+        userData.status ||
+        userData.account_status ||
+        userData.accountStatus ||
+        userData.premium ||
+        ''
+    )).trim().toLowerCase();
+    const isDev = status === 'dev' || status === 'developer';
+    const devAdsToggle = document.getElementById('header-dev-ads-toggle');
+    if (devAdsToggle) {
+        const checkbox = devAdsToggle.querySelector('input[type="checkbox"]');
+        devAdsToggle.hidden = !isDev;
+        if (checkbox) checkbox.disabled = !isDev;
+    }
+
+    // Moderation links are only useful to moderators and devs. The pages are
+    // gated server-side regardless; this just keeps the menu tidy.
+    const isMod = ['mod', 'moderator', 'admin', 'dev', 'developer'].includes(status);
+    document.querySelectorAll('.mod-only-link').forEach(link => {
+        link.hidden = !isMod;
+    });
+    
+
+
+    // read icon from cookie and set it as the src of the account icon in the header
+    /*const accountIcon = getPreferenceCookie('cadbay_account_icon') || '/assets/accountIconsDefault/robot.png';
+    const accountIconElement = document.getElementById('account-icon');
+    if (accountIconElement) {
+        accountIconElement.src = accountIcon;
+        accountIconElement.alt = 'Account icon';
+        accountIconElement.onerror = () => {
+            accountIconElement.src = '/assets/accountIconsDefault/robot.png';
+        };*/
+}
+
+
+
+    </script>
+
+
+    <div class="header-left">
+        <button class="dark-mode-btn" id="darkModeToggle" type="button" aria-label="Toggle dark mode" aria-pressed="false">
+            <img class="toggle-icon" id="toggleIcon" src="/assets/CADBayLight.png" alt="CADBay logo - switch to dark mode" width="160" height="42" onerror="this.onerror=null; this.src='/assets/CADBayLight.webp';">
+        </button>
+        <!-- only show ad toggle for devs, devs will have "dev" instead of a premium expiration date -->
+
+        <label id="header-dev-ads-toggle" class="dev-ads-toggle" hidden>
+           <input type="checkbox" aria-label="Enable advertisements">
+           <span class="dev-ads-toggle-label">Ads</span>
+        </label>
+    </div>
+
+    <div class="header-right">
+        <div class="dropdown-menu" id="account-dropdown" style="display: none;">
+            <button id="account-btn" class="dropdown-btn account-btn" type="button" aria-haspopup="true" aria-expanded="false" onclick="toggleAccountMenu(event)">
+                <img id="account-icon" class="account-icon" src="" alt=""><!-- the account icon is stored as a cookie with the filename unless it is a default, in which case it is just the name of tjhe default icon-->
+                <span class="account-label">Account</span> ▼
+            </button>
+            <div class="dropdown-items">
+                <a href="/premium-upgrade">Premium Upgrade</a>
+                <a href="/my-rfps">My RFPs</a>
+                <a href="/my-proposals">My Proposals</a>
+                <a href="/settings">Settings</a>
+                <!-- Shown only to moderator and developer accounts; the pages
+                     themselves are also refused by the server. -->
+                <a href="/+Approvals.html" class="mod-only-link" hidden>Approvals</a>
+                <a href="/+Reports.html" class="mod-only-link" hidden>Reports</a>
+                <a href="/+WorkTracking.html" class="mod-only-link" hidden>Work tracking</a>
+                <a href="#" onclick="logout(event); return false;">Logout</a>
+            </div>
+            <div class="dropdown-items no-html-links" style="margin-top:8px;">
+                <a href="/premium-upgrade">Premium Upgrade (no .html)</a>
+                <a href="/my-rfps">My RFPs (no .html)</a>
+                <a href="/my-proposals">My Proposals (no .html)</a>
+                <a href="/settings">Settings (no .html)</a>
+            </div>
+        </div>
+        <button id="login-btn" class="account-btn" type="button" onclick="openLoginRegister()">Login</button>
+    </div>
+</header>
+<div id="cookie-banner" class="cookie-banner hidden">
+  <div class="cookie-banner-content">
+    <span>CADBay uses cookies and local storage to keep you logged in and improve your experience.</span>
+    <button id="accept-cookies" class="cookie-accept-btn">Accept</button> <!-- accept cookies and enable light/dark mode, account login, and save preferences -->
+    <button id="reject-cookies" class="cookie-reject-btn">Reject</button> <!-- reject cookies but still allow basic functionality, disable dark mode toggle and account login, and do not save preferences -->
+    <button id="my-cookies" class="cookie-my-btn">My Cookies!</button> <!-- redirect to cookie clicker-->
+  </div>
+</div>
+<script>
+function safeParseSessionData(raw) {
+    try {
+        return JSON.parse(raw);
+    } catch (err) {
+        return null;
+    }
+}
+
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+function setPreferenceCookie(name, value, maxAge = 31536000) {
+    const secureAttribute = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(String(value))}; Path=/; Max-Age=${maxAge}; SameSite=Lax${secureAttribute}`;
+}
+
+function getPreferenceCookie(name) {
+    const value = getCookie(name);
+    return value === undefined ? null : decodeURIComponent(value);
+}
+
+function getSessionData() {
+    const raw = localStorage.getItem('cadbay_user_data');
+    const expiry = parseInt(localStorage.getItem('cadbay_session_expires'), 10);
+    if (!raw || !expiry) {
+        return null;
+    }
+
+    if (Date.now() > expiry) {
+        clearLoginSession();
+        return null;
+    }
+
+    return safeParseSessionData(raw);
+}
+
+function normalizeStoredAccountStatus(userData) {
+    if (!userData) return '';
+
+    const explicitStatus = String(
+        userData.status ||
+        userData.account_status ||
+        userData.accountStatus ||
+        ''
+    ).trim().toLowerCase();
+    const premiumStatus = String(userData.premium || '').trim().toLowerCase();
+
+    if (premiumStatus === 'dev' || premiumStatus === 'developer') {
+        return 'dev';
+    }
+    return explicitStatus;
+}
+
+function persistLoginSession(userData) {
+  if (!userData || !userData.user_id) {
+    return false;
+  }
+    const previousSession = getSessionData();
+    const status = normalizeStoredAccountStatus(userData) ||
+        normalizeStoredAccountStatus(previousSession);
+    const data = {
+        ...userData,
+        status,
+        account_status: status,
+        lastLogin: Date.now()
+    };
+    localStorage.setItem('cadbay_user_data', JSON.stringify(data));
+    localStorage.setItem('cadbay_user', userData.username || userData.user_id || '');
+    localStorage.setItem('cadbay_session_expires', (Date.now() + 14 * 24 * 60 * 60 * 1000).toString());
+    const secureAttribute = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `cadbay_session=active; Path=/; Max-Age=1209600; SameSite=Lax${secureAttribute}`;
+    return true;
+}
+
+function clearLoginSession() {
+    localStorage.removeItem('cadbay_user_data');
+    localStorage.removeItem('cadbay_user');
+    localStorage.removeItem('cadbay_session_expires');
+    const secureAttribute = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `cadbay_session=; Path=/; Max-Age=0; SameSite=Lax${secureAttribute}`;
+    document.cookie = `cadbay_token=; Path=/; Max-Age=0; SameSite=Lax${secureAttribute}`;
+}
+
+
+
+//here
+function isPremiumOrEnterpriseAccount(userData) {
+    if (!userData) return false;
+    const status = String(userData.status || userData.account_status || userData.accountStatus || '').trim().toLowerCase();
+    if (['premium', 'enterprise', 'dev', 'insider'].includes(status)) {
+        return true;
+    }
+    if (userData.premium === true || userData.premium === 'true' || userData.premium === 1 || userData.premium === '1') {
+        return true;
+    }
+    if (typeof userData.premium === 'string') {
+        const normalized = userData.premium.trim();
+        if (!normalized || normalized === 'none' || normalized === 'null') return false;
+        const parts = normalized.split('-');
+        if (parts.length === 3) {
+            const expiry = new Date(Number(parts[2]), Number(parts[0]) - 1, Number(parts[1]), 23, 59, 59);
+            return !Number.isNaN(expiry.getTime()) && expiry > new Date();
+        }
+        return normalized.toLowerCase() === 'premium';
+    }
+    return Boolean(userData.premium);
+}
+
+function updateAccountMenu() {
+    const userData = getSessionData();
+    updateDevAdsToggleVisibility();
+    const accountDropdown = document.getElementById('account-dropdown');
+    const loginBtn = document.getElementById('login-btn');
+    const accountBtn = document.getElementById('account-btn');
+    const loggedIn = Boolean(userData && (userData.username || userData.user_id));
+    const hidePremiumLinks = Boolean(userData && isPremiumOrEnterpriseAccount(userData));
+
+    document.querySelectorAll('a[href*="premium-upgrade"]').forEach(link => {
+        link.style.display = hidePremiumLinks ? 'none' : '';
+    });
+
+    if (loggedIn) {//if logged in use account dropdown with the button using the icon and username from the user instead of the login button
+        if (accountDropdown) accountDropdown.style.display = 'inline-block';
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (accountBtn) {
+          const accountLabel = accountBtn.querySelector('.account-label');
+          const accountIconElement = accountBtn.querySelector('#account-icon');
+          const accountIcon = getPreferenceCookie('cadbay_account_icon') || userData.account_icon || userData.icon || '/assets/accountIconsDefault/robot.png';
+          if (accountLabel) accountLabel.textContent = userData.username || userData.user_id;
+          if (accountIconElement) {
+              accountIconElement.src = accountIcon;
+              accountIconElement.alt = `${userData.username || userData.user_id} account icon`;
+              accountIconElement.onerror = () => {
+                  accountIconElement.src = '/assets/accountIconsDefault/robot.png';
+              };
+          }
+          setPreferenceCookie('cadbay_account_icon', accountIcon);
+          accountBtn.classList.toggle('has-custom-icon', Boolean(accountIcon));
+        }
+    } else {
+        if (accountDropdown) accountDropdown.style.display = 'none';
+        if (loginBtn) loginBtn.style.display = 'inline-block';
+        if (accountBtn) {
+          const accountLabel = accountBtn.querySelector('.account-label');
+          const accountIconElement = accountBtn.querySelector('#account-icon');
+          if (accountLabel) accountLabel.textContent = 'Account';
+          if (accountIconElement) {
+              accountIconElement.src = '/assets/accountIconsDefault/robot.png';
+              accountIconElement.alt = '';
+          }
+          setPreferenceCookie('cadbay_account_icon', '/assets/accountIconsDefault/robot.png');
+          accountBtn.classList.remove('has-custom-icon');
+        }
+    }
+}
+
+window.getSessionData = getSessionData;
+window.persistLoginSession = persistLoginSession;
+window.clearLoginSession = clearLoginSession;
+window.updateAccountMenu = updateAccountMenu;
+
+function toggleAccountMenu(event) {
+  if (event) event.stopPropagation();
+  const accountDropdown = document.getElementById('account-dropdown');
+  const dropdownItems = accountDropdown && accountDropdown.querySelector('.dropdown-items:not(.no-html-links)');
+  const accountBtn = document.getElementById('account-btn');
+  if (!accountDropdown || accountDropdown.style.display === 'none' || !dropdownItems) return;
+
+  const isOpen = dropdownItems.style.display === 'block';
+  dropdownItems.style.display = isOpen ? 'none' : 'block';
+  if (accountBtn) accountBtn.setAttribute('aria-expanded', String(!isOpen));
+}
+
+window.toggleAccountMenu = toggleAccountMenu;
+
+document.addEventListener('click', function(event) {
+  if (event.target.closest('#account-dropdown')) return;
+  const dropdownItems = document.querySelector('#account-dropdown .dropdown-items:not(.no-html-links)');
+  const accountBtn = document.getElementById('account-btn');
+  if (dropdownItems) dropdownItems.style.display = 'none';
+  if (accountBtn) accountBtn.setAttribute('aria-expanded', 'false');
+});
+
+async function logout(event) {
+    if (event) event.preventDefault();
+    try {
+        const logoutUrl = typeof window.cadbayApiUrl === 'function' ? window.cadbayApiUrl('/logout') : '/api/logout';
+        await fetch(logoutUrl, { method: 'GET', credentials: 'include', cache: 'no-store' });
+    } catch (error) {
+        console.warn('Server logout could not be reached:', error);
+    } finally {
+        clearLoginSession();
+        updateAccountMenu();
+        window.location.href = '/main.html';
+    }
+}
+
+function hasCookieConsent() {
+    return localStorage.getItem('cadbay_cookie_consent') === 'accepted';
+}
+
+function enableAllFeatures() {
+    // Enable light/dark mode toggle, account login, save preferences
+    localStorage.setItem('cadbay_features_enabled', 'true');
+    // Re-enable any disabled UI elements
+    const themeToggle = document.getElementById('darkModeToggle');
+    const loginBtn = document.getElementById('login-btn');
+    if (themeToggle) themeToggle.style.display = '';
+    if (loginBtn) loginBtn.style.display = '';
+}
+
+function disableEnhancedFeatures() {
+    // Disable dark mode toggle, account login, don't save preferences
+    localStorage.setItem('cadbay_features_enabled', 'false');
+    // Hide enhanced UI elements
+    const themeToggle = document.getElementById('darkModeToggle');
+    const loginBtn = document.getElementById('login-btn');
+    if (themeToggle) themeToggle.style.display = 'none';
+    if (loginBtn) loginBtn.style.display = 'none';
+    // Clear any saved preferences
+    localStorage.removeItem('cadbay_theme');
+}
+
+function showCookieBanner() {
+    const banner = document.getElementById('cookie-banner');
+    if (!banner) return;
+
+    if (hasCookieConsent()) {
+        banner.classList.add('hidden');
+        return;
+    }
+
+    banner.classList.remove('hidden');
+    const acceptBtn = document.getElementById('accept-cookies');
+    const rejectBtn = document.getElementById('reject-cookies');
+    const myCookiesBtn = document.getElementById('my-cookies');
+
+    if (acceptBtn) {
+        acceptBtn.addEventListener('click', () => {
+            localStorage.setItem('cadbay_cookie_consent', 'accepted');
+            // Enable all features: light/dark mode, account login, save preferences
+            enableAllFeatures();
+            banner.classList.add('hidden');
+        });
+    }
+
+    if (rejectBtn) {
+        rejectBtn.addEventListener('click', () => {
+            localStorage.setItem('cadbay_cookie_consent', 'rejected');
+            // Disable enhanced features: dark mode toggle, account login, don't save preferences
+            disableEnhancedFeatures();
+            banner.classList.add('hidden');
+        });
+    }
+
+    if (myCookiesBtn) {
+        myCookiesBtn.addEventListener('click', () => {
+            // Redirect to cookie clicker game
+            window.open('https://orteil.dashnet.org/cookieclicker/', '_blank');
+        });
+    }
+}
+
+// Update account menu immediately when page loads
+updateAccountMenu();
+
+// Also update when DOM is fully loaded
+document.addEventListener('DOMContentLoaded', updateAccountMenu);
+
+showCookieBanner();
+</script>

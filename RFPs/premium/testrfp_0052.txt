@@ -1,0 +1,9 @@
+RFP ID: testrfp_0052
+Owner: forge_and_line
+Title: Facade Study #403
+Short Description: Rhino Facade Study for a indie team.
+Long Description: Model the existing structure and show the proposed extension in two options. Estimated effort: 221 hours.
+Budget: 250.00
+Tier: premium
+Project Type: architectural
+Program: Rhino

@@ -1,0 +1,9 @@
+RFP ID: testrfp_0020
+Owner: northlight
+Title: Save Load Layer #768
+Short Description: GameMaker Studio Save Load Layer for a OEM.
+Long Description: Write a deterministic procedural generator for cave layouts with seeded runs. Estimated effort: 141 hours.
+Budget: 24000.00
+Tier: free
+Project Type: game-programming
+Program: GameMaker Studio

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Proposals - CADBay</title>
+    <meta name="application-name" content="CADBay - my-proposals">
+    <link rel="stylesheet" href="colorDefault.css">
+    <script src="dynamics.js"></script>
+</head>
+<body id="cadbay-my-proposals" data-app="cadbay">
+    <div id="header"></div>
+
+    <main class="account-page">
+        <h1>My Proposals</h1>
+        <p>Track proposals submitted for CADBay RFPs.</p>
+        <div class="account-empty-state">
+            <h2>No proposals yet</h2>
+            <p>Proposal submission is not available until an RFP owner opens a project for bids.</p>
+            <a href="/my-rfps">Browse your RFPs</a>
+        </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <!-- Fragment loading is handled by dynamics.js. -->
+    <!--
+        function resolveFragmentUrl(path) {
+            if (/^(https?:)?\/\//i.test(path)) {
+                return path;
+            }
+            return new URL(path, window.location.href).href;
+        }
+
+        async function loadFragment(containerId, path) {
+            const url = resolveFragmentUrl(path);
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to load ${url}: ${response.status} ${response.statusText}`);
+            }
+            const html = await response.text();
+            const container = document.getElementById(containerId);
+            if (!container) {
+                throw new Error(`Fragment container "${containerId}" not found`);
+            }
+            container.innerHTML = html;
+            const scripts = Array.from(container.querySelectorAll('script'));
+            await Promise.all(scripts.map(old => {
+                const script = document.createElement('script');
+                Array.from(old.attributes).forEach(attr => script.setAttribute(attr.name, attr.value));
+                if (old.src) {
+                    script.async = false;
+                    script.src = old.src;
+                    return new Promise((resolve, reject) => {
+                        script.onload = resolve;
+                        script.onerror = () => reject(new Error(`Failed to load script ${old.src}`));
+                        old.parentNode.replaceChild(script, old);
+                    });
+                }
+                script.textContent = old.textContent;
+                old.parentNode.replaceChild(script, old);
+                return Promise.resolve();
+            }));
+        }
+
+        loadFragment('header', 'header.html').then(() => {
+            if (typeof initializeDarkMode === 'function') initializeDarkMode();
+            if (typeof updateAccountMenu === 'function') updateAccountMenu();
+            return loadFragment('footer', 'footer.html');
+        }).catch(error => console.error('Failed to load fragments:', error));
+    </script> -->
+</body>
+</html>

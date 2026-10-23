@@ -1,0 +1,9 @@
+RFP ID: testrfp_0008
+Owner: forge_and_line
+Title: Bearing Carrier #566
+Short Description: Solidworks Bearing Carrier for a studio.
+Long Description: Deliver a fully constrained parametric model with a manufacturing drawing set. Estimated effort: 69 hours.
+Budget: 250.00
+Tier: free
+Project Type: engineering
+Program: Solidworks

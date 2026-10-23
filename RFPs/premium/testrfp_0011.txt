@@ -1,0 +1,9 @@
+RFP ID: testrfp_0011
+Owner: meridian3d
+Title: Gearbox Housing #328
+Short Description: AutoCAD Gearbox Housing for a startup.
+Long Description: Design a lightweight structural assembly that passes a 5x static load case. Estimated effort: 175 hours.
+Budget: 250.00
+Tier: premium
+Project Type: engineering
+Program: AutoCAD

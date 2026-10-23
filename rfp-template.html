@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="application-name" content="CADBay - RFP Showcase">
+    <title>{{PROJECT_NAME}} - CADBay RFP</title>
+    <link rel="stylesheet" href="../colorDefault.css">
+    <script src="../api-config.js"></script>
+    <script src="../dynamics.js"></script> <!-- load the dynamics.js file to handle the header, footer, and token processing -->
+</head>
+<body id="cadbay-rfp-showcase" data-app="cadbay">
+    <div id="header"></div>
+
+    <main style="padding: 24px; max-width: 900px; margin: 0 auto;">
+        <h1>{{PROJECT_NAME}}</h1>
+        <p class="rfp-meta">Created by: {{CREATOR_NAME}} | Proposed Price: ${{PROPOSED_PRICE}}</p>
+
+        <div class="rfp-section">
+            <h2>Short Description</h2>
+            <p>{{SHORT_DESCRIPTION}}</p>
+        </div>
+
+        <div class="rfp-section">
+            <h2>Detailed Description</h2>
+            <p>{{LONG_DESCRIPTION}}</p>
+        </div>
+<!-- only instert images that are not four astersisks ****-->
+
+<script>
+    if (imagePath1 != "****" || imagePath2 != "****" || imagePath3 != "****") {
+        document.write('<h2>Project Images</h2><div class="rfp-section">');
+        if (imagePath1 != "****") {
+            document.write('<img src="{{IMAGE_PATH1}}" alt="Project Image 1" style="max-width: 100%; margin: 10px 0;">');
+        }
+        if (imagePath2 != "****") {
+            document.write('<img src="{{IMAGE_PATH2}}" alt="Project Image 2" style="max-width: 100%; margin: 10px 0;">');
+        }
+        if (imagePath3 != "****") {
+            document.write('<img src="{{IMAGE_PATH3}}" alt="Project Image 3" style="max-width: 100%; margin: 10px 0;">');
+        }
+        document.write('</div>');
+    }
+
+
+
+
+
+
+
+
+    function claimJob(claimorId, rfpId, status) {
+        runClaimJob( claimorId, rfpId, status);
+    }
+</script>
+
+        <div class="rfp-actions">
+            <button id="contact-btn" class="auth-submit-btn">Contact Creator</button>
+            <button id="claim-btn" class="auth-submit-btn">Claim This Job</button>
+        </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <script>
+        // Load fragments
+        function resolveFragmentUrl(path) {
+            if (/^(https?:)?\/\//i.test(path)) {
+                return path;
+            }
+            return new URL(path, window.location.href).href;
+        }
+
+        async function loadFragment(containerId, path) {
+            const url = resolveFragmentUrl(path);
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to load ${url}: ${response.status} ${response.statusText}`);
+            }
+            const html = await response.text();
+            const container = document.getElementById(containerId);
+            if (!container) {
+                throw new Error(`Fragment container "${containerId}" not found`);
+            }
+            container.innerHTML = html;
+            const scripts = Array.from(container.querySelectorAll('script'));
+            await Promise.all(scripts.map(old => {
+                const script = document.createElement('script');
+                Array.from(old.attributes).forEach(attr => script.setAttribute(attr.name, attr.value));
+                if (old.src) {
+                    script.async = false;
+                    script.src = old.src;
+                    return new Promise((resolve, reject) => {
+                        script.onload = resolve;
+                        script.onerror = () => reject(new Error(`Failed to load script ${old.src}`));
+                        old.parentNode.replaceChild(script, old);
+                    });
+                }
+                script.textContent = old.textContent;
+                old.parentNode.replaceChild(script, old);
+                return Promise.resolve();
+            }));
+        }
+
+        loadFragment('header', '../header.html').then(() => {
+            if (typeof initializeDarkMode === 'function') initializeDarkMode();
+            if (typeof updateAccountMenu === 'function') updateAccountMenu();
+            return loadFragment('footer', '../footer.html');
+        }).catch(error => console.error('Failed to load fragments:', error));
+
+        // Load RFP data
+        async function loadRFP() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const rfpId = urlParams.get('id');
+            if (!rfpId) return;
+
+            try {
+                const response = await fetch(cadbayApiUrl('/rfp/' + encodeURIComponent(rfpId)));
+                const rfp = await response.json();
+
+                // Update page content
+                document.title = `${rfp.project_name} - CADBay RFP`;
+                document.querySelector('h1').textContent = rfp.project_name;
+                document.querySelector('.rfp-meta').innerHTML = `Created by: ${rfp.creator_name} | Proposed Price: $${rfp.proposed_price}`;
+
+                document.querySelectorAll('.rfp-section p')[0].textContent = rfp.short_description;
+                document.querySelectorAll('.rfp-section p')[1].textContent = rfp.long_description;
+
+                // Load images
+                const imagesContainer = document.getElementById('rfp-images');
+                if (rfp.images && rfp.images.length > 0) {
+                    imagesContainer.innerHTML = '<h2>Project Images</h2>';
+                    rfp.images.forEach(img => {
+                        const imgElement = document.createElement('img');
+                        imgElement.src = img;
+                        imgElement.style.maxWidth = '100%';
+                        imgElement.style.margin = '10px 0';
+                        imagesContainer.appendChild(imgElement);
+                    });
+                }
+            } catch (err) {
+                console.error('Failed to load RFP:', err);
+            }
+        }
+
+        loadRFP();
+
+        // Contact and claim buttons
+        document.getElementById('contact-btn').addEventListener('click', function() {
+            alert('Contact feature coming soon!');
+        });
+
+        document.getElementById('claim-btn').addEventListener('click', claimJob());
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+RFP ID: testrfp_0042
+Owner: forge_and_line
+Title: CAD Cleanup #970
+Short Description: Other CAD Cleanup for a supplier.
+Long Description: Scope described in the attached brief; priced as a fixed-fee milestone. Estimated effort: 86 hours.
+Budget: 1200.00
+Tier: premium
+Project Type: other
+Program: Other

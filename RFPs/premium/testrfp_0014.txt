@@ -1,0 +1,9 @@
+RFP ID: testrfp_0014
+Owner: blueorbit
+Title: 3D Viewer Widget #723
+Short Description: vue 3D Viewer Widget for a indie team.
+Long Description: Build an embeddable widget that loads a glTF model and exposes orbit controls. Estimated effort: 15 hours.
+Budget: 7500.00
+Tier: premium
+Project Type: webpage-development
+Program: vue

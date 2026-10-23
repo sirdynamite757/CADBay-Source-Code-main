@@ -1,0 +1,9 @@
+RFP ID: testrfp_0012
+Owner: nova_design
+Title: Netcode Spike #638
+Short Description: Cocos2d-x Netcode Spike for a OEM.
+Long Description: Write a deterministic procedural generator for cave layouts with seeded runs. Estimated effort: 108 hours.
+Budget: 500.00
+Tier: enterprise
+Project Type: game-programming
+Program: Cocos2d-x

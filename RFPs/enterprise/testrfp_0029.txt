@@ -1,0 +1,9 @@
+RFP ID: testrfp_0029
+Owner: atlas_works
+Title: Procedural Level Gen #553
+Short Description: GameMaker Studio Procedural Level Gen for a studio.
+Long Description: Implement a data-driven inventory with stacking, tooltips and persistence. Estimated effort: 91 hours.
+Budget: 4800.00
+Tier: enterprise
+Project Type: game-programming
+Program: GameMaker Studio

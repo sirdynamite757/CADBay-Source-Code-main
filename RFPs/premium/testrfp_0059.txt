@@ -1,0 +1,9 @@
+RFP ID: testrfp_0059
+Owner: northlight
+Title: Save Load Layer #482
+Short Description: Unity Save Load Layer for a startup.
+Long Description: Implement a data-driven inventory with stacking, tooltips and persistence. Estimated effort: 220 hours.
+Budget: 500.00
+Tier: premium
+Project Type: game-programming
+Program: Unity

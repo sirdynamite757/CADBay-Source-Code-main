@@ -1,0 +1,9 @@
+RFP ID: testrfp_0016
+Owner: skynet_labs
+Title: Combat Prototype #364
+Short Description: Cocos2d-x Combat Prototype for a startup.
+Long Description: Implement a data-driven inventory with stacking, tooltips and persistence. Estimated effort: 119 hours.
+Budget: 12000.00
+Tier: premium
+Project Type: game-programming
+Program: Cocos2d-x

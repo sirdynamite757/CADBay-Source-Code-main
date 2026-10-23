@@ -1,0 +1,9 @@
+RFP ID: testrfp_0027
+Owner: blueorbit
+Title: Gearbox Housing #805
+Short Description: Onshape Gearbox Housing for a supplier.
+Long Description: Reverse engineer an existing part and produce a watertight STEP exchange model. Estimated effort: 199 hours.
+Budget: 24000.00
+Tier: premium
+Project Type: engineering
+Program: Onshape

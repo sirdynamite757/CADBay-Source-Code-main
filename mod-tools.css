@@ -1,0 +1,280 @@
+/*
+ * mod-tools.css - styling shared by the moderation pages.
+ *
+ * Builds on the variables defined in colorDefault.css, so the pages follow the
+ * site theme (including dark and Sith mode) without duplicating any colours.
+ */
+
+.mod-shell {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.mod-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.mod-header h1 {
+    margin: 0;
+    color: var(--primary-text);
+}
+
+.mod-subtitle {
+    margin: 4px 0 0;
+    color: var(--secondary-text);
+    font-size: 0.9rem;
+}
+
+.mod-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.mod-nav a {
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--sidebar-border);
+    color: var(--link-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.mod-nav a:hover {
+    background: var(--dropdown-hover-bg);
+}
+
+.mod-nav a[aria-current="page"] {
+    background: var(--button-bg);
+    border-color: var(--button-bg);
+    color: #fff;
+}
+
+.mod-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.mod-toolbar label {
+    color: var(--primary-text);
+    font-size: 0.9rem;
+}
+
+.mod-toolbar select,
+.mod-toolbar input[type="search"] {
+    padding: 7px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--sidebar-border);
+    background: var(--panel-bg);
+    color: var(--primary-text);
+    font: inherit;
+}
+
+.mod-refresh {
+    margin-left: auto;
+    padding: 7px 14px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--button-bg);
+    color: var(--dropdown-btn-text, #fff);
+    font: inherit;
+    cursor: pointer;
+}
+
+.mod-refresh:hover {
+    background: var(--button-hover);
+}
+
+.mod-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--sidebar-border);
+    border-radius: 10px;
+    background: var(--panel-bg);
+}
+
+.mod-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.mod-table th,
+.mod-table td {
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--sidebar-border);
+    color: var(--primary-text);
+}
+
+.mod-table thead th {
+    background: var(--sidebar-bg);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.mod-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.mod-table tbody tr:hover {
+    background: var(--dropdown-hover-bg);
+}
+
+.mod-detail {
+    color: var(--secondary-text);
+    font-size: 0.85rem;
+    max-width: 42ch;
+}
+
+.mod-empty {
+    padding: 28px;
+    text-align: center;
+    color: var(--secondary-text);
+}
+
+.mod-status {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--sidebar-border);
+    color: var(--secondary-text);
+}
+
+.mod-status.is-pending {
+    color: #b26a00;
+    border-color: #e0b562;
+}
+
+.mod-status.is-approved,
+.mod-status.is-resolved,
+.mod-status.is-complete {
+    color: var(--green-color);
+    border-color: var(--green-color);
+}
+
+.mod-status.is-rejected,
+.mod-status.is-dismissed {
+    color: #c0392b;
+    border-color: #c0392b;
+}
+
+.mod-status.is-open,
+.mod-status.is-in-progress {
+    color: var(--link-color);
+    border-color: var(--link-color);
+}
+
+.mod-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.mod-action {
+    padding: 5px 11px;
+    border-radius: 6px;
+    border: 1px solid var(--sidebar-border);
+    background: var(--sidebar-bg);
+    color: var(--link-color);
+    font: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+.mod-action:hover:not(:disabled) {
+    background: var(--dropdown-hover-bg);
+}
+
+.mod-action.is-primary {
+    background: var(--button-bg);
+    border-color: var(--button-bg);
+    color: var(--dropdown-btn-text, #fff);
+}
+
+.mod-action.is-danger {
+    color: #c0392b;
+    border-color: #c0392b;
+}
+
+.mod-action:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.mod-message {
+    display: none;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.mod-message.success {
+    display: block;
+    background: color-mix(in srgb, var(--green-color) 18%, transparent);
+    border: 1px solid var(--green-color);
+    color: var(--green-color);
+}
+
+.mod-message.error {
+    display: block;
+    background: rgba(192, 57, 43, 0.14);
+    border: 1px solid #c0392b;
+    color: #c0392b;
+}
+
+.mod-access-denied {
+    max-width: 560px;
+    margin: 80px auto;
+    padding: 28px;
+    text-align: center;
+    border: 1px solid var(--sidebar-border);
+    border-radius: 12px;
+    background: var(--panel-bg);
+    color: var(--primary-text);
+}
+
+.mod-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.mod-summary .mod-card {
+    flex: 1 1 160px;
+    padding: 14px 16px;
+    border: 1px solid var(--sidebar-border);
+    border-radius: 10px;
+    background: var(--panel-bg);
+}
+
+.mod-card .mod-card-label {
+    display: block;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--secondary-text);
+}
+
+.mod-card .mod-card-value {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--primary-text);
+}

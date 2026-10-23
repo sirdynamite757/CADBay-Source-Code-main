@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Upgrade - CADBay</title>
+    <meta name="application-name" content="CADBay - premium-upgrade">
+    <link rel="stylesheet" href="colorDefault.css">
+    <script src="api-config.js"></script>
+    <script src="dynamics.js"></script>
+</head>
+<div id="header"></div>
+<body id="cadbay-premium-upgrade" data-app="cadbay">
+<div position="centered"><!-- centered -->
+        <main class="premium-page">
+        <div id="ad-panel" class="ad-panel"><div id="ad-content"></div></div>
+        <h1>CADBay Premium</h1>
+        <p>Choose a plan and continue to payment when billing is connected.</p>
+        <p id="premium-status" role="status">Checking account status...</p>
+        <p id="premium-action"></p>
+        <section class="premium-plans" aria-label="Premium plans">
+            <article class="premium-plan">
+                <h2>Monthly</h2>
+                <p class="premium-price">$5 / month</p>
+                <p>Premium access for one month.</p>
+                <button type="button" onclick="selectPremiumPlan('monthly')">Choose monthly</button>
+            </article>
+            <article class="premium-plan premium-plan-featured">
+                <h2>Annual</h2>
+                <p class="premium-price">$48 / year</p>
+                <p>Save 20% with annual premium access.</p>
+                <button type="button" onclick="selectPremiumPlan('annual')">Choose annual</button>
+            </article>
+        </section>
+        <section class="premium-benefits">
+            <h2>Premium benefits</h2>
+            <ul>
+                <li>Custom account icons</li>
+                <li>Ad-free account experience</li>
+                <li>Premium account features as they launch</li>
+            </ul>
+        </section>
+        <p id="premium-selection" role="status"></p>
+        <section class="premium-checkout" aria-labelledby="checkout-heading">
+            <h2 id="checkout-heading">Checkout</h2>
+            <p id="checkout-plan">Select a plan above to continue.</p>
+            <form id="premium-checkout-form" class="checkout-form" autocomplete="on">
+                <input type="hidden" id="checkout-plan-value" name="plan">
+                <label for="checkout-email">Email address</label>
+                <input id="checkout-email" name="email" type="email" autocomplete="email" placeholder="you@example.com">
+
+                <label for="checkout-phone">Phone number</label>
+                <input id="checkout-phone" name="phone" type="tel" autocomplete="tel" placeholder="+1 555 555 5555">
+                <small>Provide an email address or phone number.</small>
+
+                <label for="checkout-name">Name on card</label>
+                <input id="checkout-name" name="cardholder" type="text" autocomplete="cc-name" required>
+
+                <label for="checkout-card">Card number</label>
+                <input id="checkout-card" name="card_number" type="text" inputmode="numeric" autocomplete="cc-number" pattern="[0-9 ]{12,23}" maxlength="23" required>
+
+                <div class="checkout-row">
+                    <div>
+                        <label for="checkout-expiry">Expiration</label>
+                        <input id="checkout-expiry" name="card_expiry" type="text" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" pattern="(0[1-9]|1[0-2])\\/[0-9]{2}" maxlength="5" required>
+                    </div>
+                    <div>
+                        <label for="checkout-cvv">Security code</label>
+                        <input id="checkout-cvv" name="card_cvc" type="password" inputmode="numeric" autocomplete="cc-csc" pattern="[0-9]{3,4}" maxlength="4" required>
+                    </div>
+                </div>
+
+                <button type="submit">Continue to payment</button>
+                <p id="checkout-message" role="status"></p>
+            </form>
+        </section>
+        <p>
+        
+        <a href="/main" style="color: #22cc00; text-decoration: none; font-weight: bold;">← Back to CADBay Home</a>
+        </p>
+    </main>
+
+    <div id="footer"></div>
+    <div id="auth-container"></div>
+
+    <script>
+        function selectPremiumPlan(plan) {
+            const session = typeof getSessionData === 'function' ? getSessionData() : null;
+            const selection = document.getElementById('premium-selection');
+            if (!session) {
+                selection.textContent = 'Please sign in before selecting a premium plan.';
+                return;
+            }
+            localStorage.setItem('cadbay_selected_premium_plan', plan);
+            document.getElementById('checkout-plan-value').value = plan;
+            document.getElementById('checkout-plan').textContent = `${plan === 'annual' ? 'Annual' : 'Monthly'} plan selected.`;
+            selection.textContent = `${plan === 'annual' ? 'Annual' : 'Monthly'} plan selected. Payment processing will be connected here later.`;
+        }
+
+        document.getElementById('premium-checkout-form').addEventListener('submit', event => {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const message = document.getElementById('checkout-message');
+            const email = document.getElementById('checkout-email').value.trim();
+            const phone = document.getElementById('checkout-phone').value.trim();
+            if (!document.getElementById('checkout-plan-value').value) {
+                message.textContent = 'Choose a premium plan first.';
+                return;
+            }
+            if (!email && !phone) {
+                message.textContent = 'Enter an email address or phone number.';
+                return;
+            }
+            if (!form.checkValidity()) {
+                message.textContent = 'Check the payment details and try again.';
+                return;
+            }
+            message.textContent = 'Payment processing is not connected yet. Your card details were not sent or stored.';
+            form.reset();
+            document.getElementById('checkout-plan-value').value = localStorage.getItem('cadbay_selected_premium_plan') || '';
+        });
+
+        const premiumStatus = document.getElementById('premium-status');
+        const premiumAction = document.getElementById('premium-action');
+        const session = typeof getSessionData === 'function' ? getSessionData() : null;
+        const accountStatus = String(session && (session.status || session.account_status || session.accountStatus) || '').trim().toLowerCase();
+        const hasActivePremiumEntitlement = typeof isPremiumActive === 'function' ? isPremiumActive(session) : false;
+        if (!session) {
+            premiumStatus.textContent = 'Sign in to choose a premium plan.';
+            premiumAction.innerHTML = '<a href="#checkout-heading">Activate premium</a>';
+        } else if (hasActivePremiumEntitlement) {
+            const statusLabel = accountStatus === 'enterprise' ? 'Enterprise' : accountStatus === 'dev' || accountStatus === 'insider' ? 'Developer access' : 'Premium';
+            premiumStatus.textContent = `${statusLabel} is active${session.premium && session.premium !== true && session.premium !== 'true' ? ` through ${session.premium}` : ''}.`;
+            premiumAction.innerHTML = '<button type="button" id="cancel-premium">Cancel premium</button>';
+            document.getElementById('cancel-premium').addEventListener('click', async () => {
+                if (!window.confirm('Cancel premium for this account?')) return;
+                const response = await fetch(cadbayApiUrl('/cancel-premium'), { method: 'POST', credentials: 'include' });
+                if (!response.ok) {
+                    premiumAction.textContent = 'Premium cancellation failed.';
+                    return;
+                }
+                session.premium = false;
+                persistLoginSession(session);
+                premiumStatus.textContent = 'Premium is canceled.';
+                premiumAction.innerHTML = '<a href="#checkout-heading">Activate premium</a>';
+            });
+        } else {
+            premiumStatus.textContent = `Signed in as ${session.username || session.user_id}.`;
+            premiumAction.innerHTML = '<a href="#checkout-heading">Activate premium</a>';
+        }
+    </script>
+
+    <script>
+        function resolveFragmentUrl(path) {
+            if (/^(https?:)?\/\//i.test(path)) {
+                return path;
+            }
+            return new URL(path, window.location.href).href;
+        }
+
+        async function loadFragment(containerId, path) {
+            const url = resolveFragmentUrl(path);
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to load ${url}: ${response.status} ${response.statusText}`);
+            }
+            const html = await response.text();
+            const container = document.getElementById(containerId);
+            if (!container) {
+                throw new Error(`Fragment container "${containerId}" not found`);
+            }
+            container.innerHTML = html;
+            const scripts = Array.from(container.querySelectorAll('script'));
+            await Promise.all(scripts.map(old => {
+                const script = document.createElement('script');
+                Array.from(old.attributes).forEach(attr => script.setAttribute(attr.name, attr.value));
+                if (old.src) {
+                    script.async = false;
+                    script.src = old.src;
+                    return new Promise((resolve, reject) => {
+                        script.onload = resolve;
+                        script.onerror = () => reject(new Error(`Failed to load script ${old.src}`));
+                        old.parentNode.replaceChild(script, old);
+                    });
+                }
+                script.textContent = old.textContent;
+                old.parentNode.replaceChild(script, old);
+                return Promise.resolve();
+            }));
+        }
+
+        loadFragment('header', 'header.html').then(() => {
+            if (typeof initializeDarkMode === 'function') initializeDarkMode();
+            if (typeof updateAccountMenu === 'function') updateAccountMenu();
+            return loadFragment('footer', 'footer.html');
+        }).catch(error => console.error('Failed to load fragments:', error));
+    </script>
+</body>
+</html>

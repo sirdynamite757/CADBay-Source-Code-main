@@ -44,10 +44,17 @@ start_server() {
     
     # look specifically for the webserver binary or the renamed process
     if pgrep -x webserver > /dev/null || pgrep -f "Server Launcher" > /dev/null; then
-        echo -e "${COLOR_YELLOW}⚠ Warning: A webserver is already running${NC}"
-        echo "Use: $0 stop   (to stop it gracefully)"
-        echo "Use: $0 clean  (to force kill it)"
-        exit 1
+        echo -e "${COLOR_YELLOW}⚠ Webserver is already running${NC}"
+        echo "Reloading file state instead of starting a new instance."
+
+        main_pid=$(ps -C webserver -o pid=,etimes= | awk '{print $1 " " $2}' | sort -k2n | head -1 | awk '{print $1}')
+        if [ -n "$main_pid" ]; then
+            kill -HUP "$main_pid" 2>/dev/null || true
+            echo "Reload signal sent to PID $main_pid."
+        else
+            echo "Could not determine the main webserver PID; the running server will continue serving files."
+        fi
+        exit 0
     fi
     
     echo -e "${COLOR_BLUE}Starting CADBay Web Server...${NC}"
@@ -71,31 +78,13 @@ start_server() {
 }
 
 stop_server() {
-    check_binary "./killwebserver"
-    
-    if ! pgrep -x webserver > /dev/null && ! pgrep -f "Server Launcher" > /dev/null; then
-        echo -e "${COLOR_YELLOW}⚠ No webserver running${NC}"
-        exit 0
-    fi
-    
     echo -e "${COLOR_BLUE}Stopping CADBay Web Server...${NC}"
-    ./killwebserver || {
-        echo -e "${COLOR_RED}✗ killwebserver reported an error${NC}"
-    }
-    
-    if ! pgrep -x webserver > /dev/null && ! pgrep -f "Server Launcher" > /dev/null; then
-        echo -e "${COLOR_GREEN}✓ Server stopped successfully${NC}"
-    else
-        echo -e "${COLOR_RED}✗ Server still running, forcing...${NC}"
-        ./killwebserver -9
-    fi
+    ./kill-server-instances.sh
 }
 
 clean_server() {
-    check_binary "./killwebserver"
-    
     echo -e "${COLOR_BLUE}Force killing webserver processes...${NC}"
-    ./killwebserver -9
+    ./kill-server-instances.sh --force
     
     echo -e "${COLOR_GREEN}✓ Cleanup complete${NC}"
 }

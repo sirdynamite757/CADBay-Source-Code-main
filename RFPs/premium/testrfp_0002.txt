@@ -1,0 +1,9 @@
+RFP ID: testrfp_0002
+Owner: skynet_labs
+Title: Assembly Jig #839
+Short Description: Fusion 360 Assembly Jig for a supplier.
+Long Description: Design a jig that holds the part within 0.2mm through the weld cycle. Estimated effort: 46 hours.
+Budget: 1200.00
+Tier: premium
+Project Type: industrial
+Program: Fusion 360

@@ -1,0 +1,9 @@
+RFP ID: testrfp_0021
+Owner: meridian3d
+Title: Gearbox Housing #992
+Short Description: AutoCAD Gearbox Housing for a OEM.
+Long Description: Reverse engineer an existing part and produce a watertight STEP exchange model. Estimated effort: 189 hours.
+Budget: 24000.00
+Tier: premium
+Project Type: engineering
+Program: AutoCAD

@@ -1,0 +1,9 @@
+RFP ID: testrfp_0001
+Owner: blueorbit
+Title: Format Conversion #883
+Short Description: Other Format Conversion for a studio.
+Long Description: Convert a mixed bag of files into a single consistent exchange format. Estimated effort: 220 hours.
+Budget: 1200.00
+Tier: premium
+Project Type: other
+Program: Other

@@ -1,0 +1,9 @@
+RFP ID: testrfp_0050
+Owner: atlas_works
+Title: Isometric Icons #565
+Short Description: jpg Isometric Icons for a startup.
+Long Description: 40 flat icons in SVG plus PNG exports at 256px and 512px. Estimated effort: 82 hours.
+Budget: 24000.00
+Tier: free
+Project Type: stock-images
+Program: jpg

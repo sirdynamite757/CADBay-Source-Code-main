@@ -1,0 +1,330 @@
+<html>
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ensure relative paths work in both live preview and production -->
+    <base href="./">
+    <!-- CSS now referenced relative; server will prepends Body/ when necessary -->
+    <link rel="stylesheet" href="colorDefault.css">
+    <meta name="application-name" content="CADBay Homepage">
+    <title>CADBay Dashboard</title>
+    <script src = "dynamics.js"> </script>
+    <!-- find the user's token in the cookies folder and use it to get the user's info from the server and display it on the dashboard, if the user is not logged in redirect to login page-->
+    <script>
+        function getUserToken() {
+            const cookies = document.cookie.split(';');
+            for (const cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'cadbay_token') {
+                    var value = decodedToken.split('=')[1];
+                    var token = value;
+                    var decodedToken = decodeURIComponent(token);
+                    
+                    return value;
+                }
+            }
+            return null;
+        }
+    </script>
+<!-- set the file path for the operations by using the token-->
+    <script>
+        const userToken = getUserToken();
+        if (userToken) {
+            const filePath = `cookies/${userToken}.json`;
+            console.log('User token found:', userToken);
+            console.log('File path for operations:', filePath);
+        } else {
+            console.log('No user token found. Redirecting to login page...');
+            window.location.href = '/login';
+        }
+    </script>
+</head>
+
+<div id="header"></div>
+<body>
+<h1>CADBay Dashboard</h1>
+
+<div id="auth-container"></div>
+<div id="dashboard-content">
+    <h2>Welcome to your dashboard!</h2>
+    <p>Here you can manage your account, view your activity, and access exclusive features.</p>
+
+
+
+
+
+
+
+
+    <h2> Premium Features</h2>
+
+    <script>
+
+        // code for toggles here
+        function toggleEmailNotifications(subtype) {
+            if (subtype == null) {
+                const emailsToggle = document.getElementById('emails');
+                if (emailsToggle) {
+                    changeSettings('emails', emailsToggle.checked);
+                }
+            } else {
+                const toggle = document.getElementById(subtype);
+                if (toggle) {
+                    changeSettings(subtype, toggle.checked);
+                }
+            }
+            const emailsToggle = document.getElementById('emails');
+            if (emailsToggle) {
+                changeSettings('emails', emailsToggle.checked);
+            }
+        }
+        
+
+        userDataStr = localStorage.getItem('cadbay_user_data');
+        if (userDataStr) {
+            const userData = JSON.parse(userDataStr);
+            if (userData.premium != null) {
+                document.write('<p>Thank you for being a premium member! Enjoy your exclusive features.</p>')// give them a menu for ads and other premium features
+                document.write('<toggle id=emails>Toggle Email Notifications</toggle>');
+                if (userData.emails == true) {
+                    document.getElementById('emails').checked = true;
+                    document.write('<toggle it=email-ads> Get special offers from our sponsors</toggle>')
+                    document.write('<toggle id=email-updates> Get updates about CADBay</toggle>')
+                    document.write('<toggle id=email-security> Get security alerts</toggle>')
+                    document.write('<toggle id=email-workflow> Get updates on your projects and RFPs</toggle>')
+                };
+            } else {
+                document.write('<p>Upgrade to premium to unlock exclusive features!</p>');// show them the options
+                document.write('<button onclick="window.location.href=\'/premium-upgrade\'">Upgrade to Premium</button>');
+                document.write('<button onclick="window.location.href=\'/premium-features\'">View Premium Features</button>');
+                document.write('<button onclick="window.location.href=\'/corporate-partnership\'"> Apply for Corporate Partnership</button>');
+                document.write('<toggle id=emails>Toggle Email Notifications</toggle>');// nonpremium members choose between all emails or no emails
+            }
+        } else {
+            document.write('<p>Please log in to access your dashboard and premium features.</p>');// add a login button that opens the login modal
+            document.write('<button onclick="openLoginModal()">Log In</button>');
+        }
+    </script>
+</div>
+<div id="footer"></div>
+</body>
+
+
+
+
+    
+
+
+<script>
+
+        function checkForAccount()
+        // if account is not found in localStorage, open the login modal
+        {
+            const userData = localStorage.getItem('cadbay_user_data');
+            const savedUsername = localStorage.getItem('cadbay_user');
+            if (!userData && !savedUsername) {
+                // open login modal
+                const loginModal = document.getElementById('login-modal');
+                if (loginModal) {
+                    loginModal.style.display = 'block';
+                }
+            }
+            // else htaccsess will handle it
+        }
+
+        function changeSettings(setting, value) {
+            const userDataStr = localStorage.getItem('cadbay_user_data');
+            if (!userDataStr) return;
+            const userData = JSON.parse(userDataStr);
+            userData[setting] = value;
+            localStorage.setItem('cadbay_user_data', JSON.stringify(userData));
+        }
+
+        function getUserData() {
+            const userDataStr = localStorage.getItem('cadbay_user_data');
+            if (!userDataStr) return null;
+            return JSON.parse(userDataStr);
+        }
+
+        function resolveFragmentUrl(path) {
+            if (/^(https?:)?\/\//i.test(path)) {
+                return path;
+            }
+            return new URL(path, window.location.href).href;
+        }
+
+        async function loadFragment(containerId, path) {
+            const url = resolveFragmentUrl(path);
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to load ${url}: ${response.status} ${response.statusText}`);
+            }
+            const html = await response.text();
+            const container = document.getElementById(containerId);
+            if (!container) {
+                throw new Error(`Fragment container "${containerId}" not found`);
+            }
+            container.innerHTML = html;
+            const scripts = Array.from(container.querySelectorAll('script'));
+            await Promise.all(scripts.map(old => {
+                const script = document.createElement('script');
+                Array.from(old.attributes).forEach(attr => script.setAttribute(attr.name, attr.value));
+                if (old.src) {
+                    script.async = false;
+                    script.src = old.src;
+                    return new Promise((resolve, reject) => {
+                        script.onload = resolve;
+                        script.onerror = () => reject(new Error(`Failed to load script ${old.src}`));
+                        old.parentNode.replaceChild(script, old);
+                    });
+                }
+                script.textContent = old.textContent;
+                old.parentNode.replaceChild(script, old);
+                return Promise.resolve();
+            }));
+        }
+
+        loadFragment('header', 'header.html').then(() => {
+            if (typeof initializeDarkMode === 'function') initializeDarkMode();
+            if (typeof updateAccountMenu === 'function') updateAccountMenu();
+            return Promise.all([
+                loadFragment('footer', 'footer.html'),
+                loadFragment('auth-container', 'loginRegister.html')
+            ]);
+        }).catch(error => {
+            console.error('Failed to load fragments:', error);
+        });
+
+        function safeParseJson(text) {
+            try {
+                return JSON.parse(text);
+            } catch (err) {
+                console.warn('Failed to parse saved user data JSON:', err);
+                return null;
+            }
+        }
+
+        function updateAccountMenu() {
+            const userDataJson = localStorage.getItem('cadbay_user_data');
+            const accountDropdown = document.getElementById('account-dropdown');
+            const loginBtn = document.getElementById('login-btn');
+            const accountBtn = document.getElementById('account-btn');
+
+            const userData = userDataJson ? safeParseJson(userDataJson) : null;
+            const savedUsername = localStorage.getItem('cadbay_user');
+            const accountName = (userData && userData.username) || savedUsername;
+            const loggedIn = Boolean(userData || savedUsername);
+
+            if (loggedIn) {
+                if (accountDropdown) accountDropdown.style.display = 'inline-block';
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (accountBtn) accountBtn.textContent = `👤 ${accountName || 'Account'} ▼`;
+            } else {
+                if (accountDropdown) accountDropdown.style.display = 'none';
+                if (loginBtn) loginBtn.style.display = 'inline-block';
+            }
+        }
+
+        const monitorButton = document.getElementById('monitor-button');
+        const userDataStr = localStorage.getItem('cadbay_user_data');
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestedAd = urlParams.get('ad');
+
+        if (userDataStr) {
+            const userData = JSON.parse(userDataStr);
+            if (monitorButton) {
+                monitorButton.style.display = 'inline-block';
+            }
+            if (!userData.premium) {
+                loadAd(requestedAd);
+            } else {
+                document.getElementById('ad-panel').style.display = 'none';
+            }
+        } else {
+            if (monitorButton) {
+                monitorButton.style.display = 'none';
+            }
+            loadAd(requestedAd);
+        }
+
+        
+
+            // dropdown menu logic (only if dropdown elements exist)
+        
+
+        window.adTheme = {
+            getCurrentTheme() {
+                return document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+            },
+            useSiteTheme(rootId = 'ad-content') {
+                const root = document.getElementById(rootId);
+                if (!root) return;
+                const theme = this.getCurrentTheme();
+                root.classList.toggle('ad-theme-dark', theme === 'dark');
+                root.classList.toggle('ad-theme-light', theme === 'light');
+            },
+            setTheme(theme, rootId = 'ad-content') {
+                const root = document.getElementById(rootId);
+                if (!root) return;
+                root.classList.toggle('ad-theme-dark', theme === 'dark');
+                root.classList.toggle('ad-theme-light', theme === 'light');
+            }
+        };
+
+        async function assetExists(path) {
+            try {
+                const response = await fetch(path, { method: 'HEAD' });
+                if (response.ok) return true;
+            } catch (e) {
+                // HEAD may not be allowed in some environments, fall back to GET for existence check.
+            }
+            try {
+                const response = await fetch(path, { method: 'GET', headers: { 'Range': 'bytes=0-1' } });
+                return response.ok;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        async function parseConf(path) {
+            try {
+                const response = await fetch(path);
+                if (!response.ok) return null;
+                const text = await response.text();
+                const config = {};
+                text.split(/\r?\n/).forEach(line => {
+                    const trimmed = line.trim();
+                    if (!trimmed || trimmed.startsWith('#')) return;
+
+                    let key, value;
+                    if (trimmed.includes('=')) {
+                        [key, ...value] = trimmed.split('=');
+                        value = value.join('=').trim();
+                    } else if (trimmed.includes(':')) {
+                        [key, ...value] = trimmed.split(':');
+                        value = value.join(':').trim();
+                    } else {
+                        // bare URL line as shorthand for link
+                        key = 'link';
+                        value = trimmed;
+                    }
+
+                    if (!key || !value) return;
+                    key = key.trim().toLowerCase();
+                    if (key === 'desc') key = 'description';
+                    config[key] = value;
+                });
+                return config;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        if (document.getElementById('monitor-button')) {
+            document.getElementById('monitor-button').addEventListener('click', function() {
+                window.location.href = 'monitor.html';
+            });
+        }
+    </script>
